@@ -1,0 +1,14 @@
+*
+!.gitignore
+
+!README.md
+!.vscode
+!.vscode/*
+
+!docker-compose.yml
+!.env.example
+
+!projo/
+!projo/mirror
+!rclone/
+!rclone/index.html

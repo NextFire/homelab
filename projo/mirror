@@ -1,0 +1,10 @@
+#!/bin/sh -x
+BASE_DIR=/projo
+
+export DEBUG=1
+
+for slug in anno miyazaki naoko oshii shinbou; do
+    PROJO_DIR=$BASE_DIR/$slug
+    python3 $PROJO_DIR/download.py --mirror
+    rm -f $PROJO_DIR/index.html
+done

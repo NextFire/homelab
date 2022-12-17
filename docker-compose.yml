@@ -1,0 +1,280 @@
+services:
+  traefik:
+    image: traefik:latest
+    environment:
+      - CLOUDFLARE_DNS_API_TOKEN=$CLOUDFLARE_DNS_API_TOKEN
+    command:
+      - --log.level=DEBUG
+      - --accesslog=true
+      - --api.dashboard=true
+      - --providers.docker=true
+      - --providers.docker.exposedByDefault=false
+      - --providers.docker.defaultRule=Host(`{{ .Name | trimSuffix "-docker" | normalize }}.$DOMAIN_NAME`)
+      - --providers.file.directory=/config
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls.certResolver=letsencrypt
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
+      - --certificatesresolvers.letsencrypt.acme.email=$ACME_EMAIL
+      - --certificatesresolvers.letsencrypt.acme.storage=/config/acme.json
+      - --certificatesresolvers.letsencrypt-tls.acme.tlschallenge=true
+      - --certificatesresolvers.letsencrypt-tls.acme.email=$ACME_EMAIL
+      - --certificatesresolvers.letsencrypt-tls.acme.storage=/config/acme.json
+    ports:
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik:/config
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.service=api@internal
+      # Middlewares definitions
+      - traefik.http.middlewares.cacheprivate.headers.customresponseheaders.Cache-Control=private
+      - traefik.http.middlewares.noindex.headers.customresponseheaders.X-Robots-Tag=noindex
+      - traefik.http.middlewares.japan7.basicauth.users=$JAPAN7_BASIC_AUTH
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    command:
+      - --cleanup
+      - --notifications=shoutrrr
+      - --notification-url=$NOTIFICATION_URL
+      - --no-startup-message
+      - "--schedule=0 0 6 * * *"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+  rclone:
+    image: rclone/rclone:latest
+    command: mount $RCLONE_REMOTE /remote --vfs-cache-mode full --cache-dir /cache --transfers 50 --checkers 100 --allow-other --allow-non-empty --verbose
+    volumes:
+      - ./rclone:/config/rclone
+      - rclone-cache:/cache
+      - $RCLONE_HOST_MOUNT:/remote:shared
+    devices:
+      - /dev/fuse
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    restart: unless-stopped
+    labels:
+      - com.centurylinklabs.watchtower.monitor-only=true
+
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    environment:
+      - VERSION=docker
+      - DOCKER_MODS=linuxserver/mods:plex-absolute-hama
+    volumes:
+      - ./plex:/config
+      - $RCLONE_HOST_MOUNT:$MEDIA_MOUNT:ro,slave
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.plex.entrypoints=websecure
+      - traefik.http.routers.plex.middlewares=cacheprivate@docker
+      - traefik.http.services.plex-docker.loadbalancer.server.port=32400
+
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    volumes:
+      - ./tautulli:/config
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tautulli.entrypoints=websecure
+      - traefik.http.services.tautulli-docker.loadbalancer.server.port=8181
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    volumes:
+      - ./qbittorrent:/config
+      - $RCLONE_HOST_MOUNT:/downloads:slave
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.qbittorrent.entrypoints=websecure
+      - traefik.http.services.qbittorrent-docker.loadbalancer.server.port=8080
+
+  filebot:
+    image: jlesage/filebot:latest
+    volumes:
+      - ./filebot:/config
+      - $RCLONE_HOST_MOUNT:/storage:slave
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.filebot.entrypoints=websecure
+      - traefik.http.services.filebot-docker.loadbalancer.server.port=5800
+
+  mkvtoolnix:
+    image: jlesage/mkvtoolnix:latest
+    volumes:
+      - ./mkvtoolnix:/config
+      - $RCLONE_HOST_MOUNT:/storage:slave
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mkvtoolnix.entrypoints=websecure
+      - traefik.http.services.mkvtoolnix-docker.loadbalancer.server.port=5800
+
+  files:
+    image: rclone/rclone:latest
+    command: serve http $RCLONE_REMOTE --addr :8080 --template /config/rclone/index.html --verbose
+    volumes:
+      - ./rclone:/config/rclone
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.files.entrypoints=websecure
+      - traefik.http.routers.files.middlewares=cacheprivate@docker,japan7@docker
+      - traefik.http.services.files-docker.loadbalancer.server.port=8080
+
+  projo:
+    image: denoland/deno:alpine
+    command: run --allow-net --allow-read https://deno.land/std/http/file_server.ts /html/ --no-dotfiles
+    volumes:
+      - $PROJO_HOST_MOUNT:/html:ro
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.projo.entrypoints=websecure
+      - traefik.http.routers.projo.middlewares=cacheprivate@docker,japan7@docker
+      - traefik.http.services.projo-docker.loadbalancer.server.port=4507
+
+  projo-dl:
+    image: python:alpine
+    entrypoint: crond -f
+    volumes:
+      - $PROJO_HOST_MOUNT:/projo
+      - ./projo:/etc/periodic/hourly:ro
+    restart: unless-stopped
+
+  librespeed:
+    image: lscr.io/linuxserver/librespeed:latest
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.librespeed.entrypoints=websecure
+      - traefik.http.services.librespeed-docker.loadbalancer.server.port=80
+
+  nanideshiko:
+    build:
+      context: ./nanideshiko-bot
+    volumes:
+      - ./nanideshiko-bot:/app
+    restart: unless-stopped
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
+
+  postgres:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      - MINIO_ROOT_USER=$MINIO_ROOT_USER
+      - MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD
+    command: server /data --console-address :9001
+    volumes:
+      - ./minio:/data
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minio.entrypoints=websecure
+      - traefik.http.routers.minio.rule=Host(`minio.$DOMAIN_NAME`)
+      - traefik.http.routers.minio.service=minio-docker
+      - traefik.http.services.minio-docker.loadbalancer.server.port=9000
+      - traefik.http.routers.minio-ui.entrypoints=websecure
+      - traefik.http.routers.minio-ui.rule=Host(`minio-ui.$DOMAIN_NAME`)
+      - traefik.http.routers.minio-ui.service=minio-ui-docker
+      - traefik.http.services.minio-ui-docker.loadbalancer.server.port=9001
+
+  keycloak:
+    image: bitnami/keycloak:latest
+    environment:
+      - KEYCLOAK_ADMIN_USER=$KEYCLOAK_ADMIN_USER
+      - KEYCLOAK_ADMIN_PASSWORD=$KEYCLOAK_ADMIN_PASSWORD
+      - KEYCLOAK_DATABASE_HOST=postgres
+      - KEYCLOAK_DATABASE_USER=$POSTGRES_USER
+      - KEYCLOAK_DATABASE_PASSWORD=$POSTGRES_PASSWORD
+      - KEYCLOAK_DATABASE_NAME=keycloak
+    volumes:
+      - ./keycloak/providers/keycloak-discord-0.4.0.jar:/opt/bitnami/keycloak/providers/keycloak-discord-0.4.0.jar
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.keycloak.entrypoints=websecure
+      - traefik.http.services.keycloak-docker.loadbalancer.server.port=8080
+
+  outline:
+    image: outlinewiki/outline:latest
+    env_file: ./.outline.env
+    entrypoint: sh -c 'yarn db:migrate --env=production-ssl-disabled && yarn start'
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.outline.entrypoints=websecure
+      - traefik.http.routers.outline.rule=Host(`docs.$DOMAIN_NAME`)
+      - traefik.http.routers.outline.middlewares=noindex@docker
+      - traefik.http.services.outline-docker.loadbalancer.server.port=3000
+      # Homepage redirection
+      - traefik.http.routers.homepage.entrypoints=websecure
+      - traefik.http.routers.homepage.rule=Host(`$DOMAIN_NAME`)
+      - traefik.http.routers.homepage.middlewares=homepage-redirect@docker
+      - traefik.http.routers.homepage.service=noop@internal
+      - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
+      - traefik.http.middlewares.homepage-redirect.redirectregex.regex=.*
+      - traefik.http.middlewares.homepage-redirect.redirectregex.replacement=$HOMEPAGE_REDIRECT_URL
+
+  outline-redis:
+    image: redis:alpine
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - ./outline-redis:/data
+    restart: unless-stopped
+
+  outline-japan7:
+    image: outlinewiki/outline:latest
+    env_file: ./.outline-japan7.env
+    entrypoint: sh -c 'yarn db:migrate --env=production-ssl-disabled && yarn start'
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.outline-japan7.entrypoints=websecure
+      - traefik.http.routers.outline-japan7.rule=Host(`$OUTLINE_JAPAN7_HOST`)
+      - traefik.http.routers.outline-japan7.tls.certresolver=letsencrypt-tls
+      - traefik.http.services.outline-japan7-docker.loadbalancer.server.port=3000
+
+  outline-japan7-redis:
+    image: redis:alpine
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - ./outline-japan7-redis:/data
+    restart: unless-stopped
+
+  waicolle:
+    image: ghcr.io/japan7/waicolle-web:main
+    environment:
+      - NANAPI_URL=$NANAPI_URL
+      - NANAPI_CLIENT_USERNAME=$WAICOLLE_NANAPI_CLIENT_USERNAME
+      - NANAPI_CLIENT_PASSWORD=$WAICOLLE_NANAPI_CLIENT_PASSWORD
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.waicolle.entrypoints=websecure
+      - traefik.http.services.waicolle-docker.loadbalancer.server.port=3000
+
+volumes:
+  rclone-cache:
