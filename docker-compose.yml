@@ -136,16 +136,15 @@ services:
       - traefik.http.services.files-docker.loadbalancer.server.port=8080
 
   projo:
-    image: denoland/deno:alpine
-    command: run --allow-net --allow-read https://deno.land/std/http/file_server.ts /html/ --no-dotfiles
+    image: nginx:alpine
     volumes:
-      - $PROJO_HOST_MOUNT:/html:ro
+      - $PROJO_HOST_MOUNT:/usr/share/nginx/html:ro
     restart: unless-stopped
     labels:
       - traefik.enable=true
       - traefik.http.routers.projo.entrypoints=websecure
       - traefik.http.routers.projo.middlewares=cacheprivate@docker,japan7@docker
-      - traefik.http.services.projo-docker.loadbalancer.server.port=4507
+      - traefik.http.services.projo-docker.loadbalancer.server.port=80
 
   projo-dl:
     image: python:alpine
@@ -202,7 +201,7 @@ services:
       - KEYCLOAK_DATABASE_PASSWORD=$POSTGRES_PASSWORD
       - KEYCLOAK_DATABASE_NAME=keycloak
     volumes:
-      - ./keycloak/providers/keycloak-discord-0.4.0.jar:/opt/bitnami/keycloak/providers/keycloak-discord-0.4.0.jar
+      - ./keycloak/providers/keycloak-discord-0.4.0.jar:/opt/bitnami/keycloak/providers/keycloak-discord-0.4.0.jar:ro
     restart: unless-stopped
     labels:
       - traefik.enable=true
