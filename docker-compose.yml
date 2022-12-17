@@ -163,15 +163,6 @@ services:
       - traefik.http.routers.librespeed.entrypoints=websecure
       - traefik.http.services.librespeed-docker.loadbalancer.server.port=80
 
-  nanideshiko:
-    build:
-      context: ./nanideshiko-bot
-    volumes:
-      - ./nanideshiko-bot:/app
-    restart: unless-stopped
-    labels:
-      - com.centurylinklabs.watchtower.enable=false
-
   postgres:
     image: postgres:alpine
     environment:
