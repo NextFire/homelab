@@ -271,17 +271,12 @@ services:
     hostname: borg
     volumes:
       - .:/mnt/source:ro # backup source
-      - borg-repo:/mnt/borg-repository # backup target
+      - $BORG_REPO:/mnt/borg-repository # backup target
       - ./borg/etc:/etc/borgmatic.d/ # borgmatic config file(s) + crontab.txt
       - ./borg/config:/root/.config/borg # config and keyfiles
       - ./borg/cache:/root/.cache/borg # checksums used for deduplication
+      - ./rclone:/root/.config/rclone
     restart: unless-stopped
 
 volumes:
   rclone-cache:
-  borg-repo:
-    driver: rclone
-    driver_opts:
-      remote: $BORG_REPO_REMOTE
-      vfs_cache_mode: full
-      allow_other: "true"
