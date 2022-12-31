@@ -8,6 +8,9 @@
 !docker-compose.yml
 !.env.example
 
+!borg/
+!borg/etc/
+!borg/etc/*
 !projo/
 !projo/mirror
 !rclone/

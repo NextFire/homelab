@@ -1,0 +1,1 @@
+0 1 * * * /etc/borgmatic.d/cron.sh

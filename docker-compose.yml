@@ -269,6 +269,8 @@ services:
   borg:
     image: b3vis/borgmatic:latest
     hostname: borg
+    environment:
+      - BORG_REPO_REMOTE=$BORG_REPO_REMOTE
     volumes:
       - .:/mnt/source:ro # backup source
       - $BORG_REPO:/mnt/borg-repository # backup target
