@@ -90,6 +90,17 @@ services:
       - traefik.http.routers.tautulli.entrypoints=websecure
       - traefik.http.services.tautulli-docker.loadbalancer.server.port=8181
 
+  flexget:
+    image: flexget/flexget:latest
+    command: daemon start --autoreload-config
+    volumes:
+      - ./flexget:/config
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.flexget.entrypoints=websecure
+      - traefik.http.services.flexget-docker.loadbalancer.server.port=5050
+
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     volumes:
