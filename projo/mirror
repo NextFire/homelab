@@ -1,6 +1,8 @@
 #!/bin/sh -x
-BASE_DIR=/projo
+# flock magic
+[ "${FLOCKER}" != "$0" ] && exec env FLOCKER="$0" flock -xn "$0" "$0" "$@" ||
 
+BASE_DIR=/projo
 export DEBUG=1
 
 for slug in anno miyazaki naoko oshii shinbou; do
