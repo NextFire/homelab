@@ -255,17 +255,6 @@ services:
       - ./outline-redis:/data
     restart: unless-stopped
 
-  waicolle:
-    image: ghcr.io/japan7/waicolle-web:main
-    environment:
-      - NANAPI_URL=$NANAPI_URL
-      - NANAPI_CLIENT_USERNAME=$WAICOLLE_NANAPI_CLIENT_USERNAME
-      - NANAPI_CLIENT_PASSWORD=$WAICOLLE_NANAPI_CLIENT_PASSWORD
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.waicolle.entrypoints=websecure
-      - traefik.http.services.waicolle-docker.loadbalancer.server.port=3000
   borg:
     image: b3vis/borgmatic:latest
     hostname: borg
