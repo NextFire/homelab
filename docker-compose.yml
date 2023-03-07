@@ -11,6 +11,9 @@ services:
       - --providers.docker.exposedByDefault=false
       - --providers.docker.defaultRule=Host(`{{ .Name | trimSuffix "-docker" | normalize }}.$DOMAIN_NAME`)
       - --providers.file.directory=/config
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
@@ -20,6 +23,7 @@ services:
       - --certificatesresolvers.letsencrypt-tls.acme.email=$ACME_EMAIL
       - --certificatesresolvers.letsencrypt-tls.acme.storage=/config/acme.json
     ports:
+      - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -147,15 +151,16 @@ services:
       - traefik.http.services.files-docker.loadbalancer.server.port=8080
 
   projo:
-    image: nginx:alpine
+    image: denoland/deno:alpine
+    command: run --allow-net --allow-read https://deno.land/std/http/file_server.ts /html --no-dotfiles
     volumes:
-      - $PROJO_HOST_MOUNT:/usr/share/nginx/html:ro
+      - $PROJO_HOST_MOUNT:/html:ro
     restart: unless-stopped
     labels:
       - traefik.enable=true
       - traefik.http.routers.projo.entrypoints=websecure
       - traefik.http.routers.projo.middlewares=cacheprivate@docker,japan7@docker
-      - traefik.http.services.projo-docker.loadbalancer.server.port=80
+      - traefik.http.services.projo-docker.loadbalancer.server.port=4507
 
   projo-dl:
     image: python:alpine
@@ -187,6 +192,8 @@ services:
     environment:
       - MINIO_ROOT_USER=$MINIO_ROOT_USER
       - MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD
+      - MINIO_SERVER_URL=https://minio.$DOMAIN_NAME
+      - MINIO_BROWSER_REDIRECT_URL=https://minio.$DOMAIN_NAME/console/
     command: server /data --console-address :9001
     volumes:
       - ./minio:/data
@@ -198,9 +205,11 @@ services:
       - traefik.http.routers.minio.service=minio-docker
       - traefik.http.services.minio-docker.loadbalancer.server.port=9000
       - traefik.http.routers.minio-ui.entrypoints=websecure
-      - traefik.http.routers.minio-ui.rule=Host(`minio-ui.$DOMAIN_NAME`)
+      - traefik.http.routers.minio-ui.rule=Host(`minio.$DOMAIN_NAME`) && PathPrefix(`/console`)
+      - traefik.http.routers.minio-ui.middlewares=minio-stripprefix@docker
       - traefik.http.routers.minio-ui.service=minio-ui-docker
       - traefik.http.services.minio-ui-docker.loadbalancer.server.port=9001
+      - traefik.http.middlewares.minio-stripprefix.stripprefix.prefixes=/console
 
   keycloak:
     image: bitnami/keycloak:latest
@@ -246,25 +255,6 @@ services:
       - ./outline-redis:/data
     restart: unless-stopped
 
-  outline-japan7:
-    image: outlinewiki/outline:latest
-    env_file: ./.outline-japan7.env
-    entrypoint: sh -c 'yarn db:migrate --env=production-ssl-disabled && yarn start'
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.outline-japan7.entrypoints=websecure
-      - traefik.http.routers.outline-japan7.rule=Host(`$OUTLINE_JAPAN7_HOST`)
-      - traefik.http.routers.outline-japan7.tls.certresolver=letsencrypt-tls
-      - traefik.http.services.outline-japan7-docker.loadbalancer.server.port=3000
-
-  outline-japan7-redis:
-    image: redis:alpine
-    command: redis-server --save 60 1 --loglevel warning
-    volumes:
-      - ./outline-japan7-redis:/data
-    restart: unless-stopped
-
   waicolle:
     image: ghcr.io/japan7/waicolle-web:main
     environment:
@@ -276,7 +266,6 @@ services:
       - traefik.enable=true
       - traefik.http.routers.waicolle.entrypoints=websecure
       - traefik.http.services.waicolle-docker.loadbalancer.server.port=3000
-
   borg:
     image: b3vis/borgmatic:latest
     hostname: borg
