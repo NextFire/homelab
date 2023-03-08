@@ -19,9 +19,6 @@ services:
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.letsencrypt.acme.email=$ACME_EMAIL
       - --certificatesresolvers.letsencrypt.acme.storage=/config/acme.json
-      - --certificatesresolvers.letsencrypt-tls.acme.tlschallenge=true
-      - --certificatesresolvers.letsencrypt-tls.acme.email=$ACME_EMAIL
-      - --certificatesresolvers.letsencrypt-tls.acme.storage=/config/acme.json
     ports:
       - "80:80"
       - "443:443"
