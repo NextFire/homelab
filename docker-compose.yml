@@ -50,7 +50,7 @@ services:
     restart: unless-stopped
 
   rclone:
-    image: rclone/rclone:latest
+    image: rclone/rclone:1.62
     command: mount $RCLONE_REMOTE /remote --vfs-cache-mode full --cache-dir /cache --transfers 50 --checkers 100 --allow-other --allow-non-empty --verbose
     volumes:
       - ./rclone:/config/rclone
@@ -148,8 +148,8 @@ services:
       - traefik.http.services.files-docker.loadbalancer.server.port=8080
 
   projo:
-    image: denoland/deno:alpine
-    command: run --allow-net --allow-read https://deno.land/std/http/file_server.ts /html --no-dotfiles
+    image: svenstaro/miniserve:alpine
+    command: /html
     volumes:
       - $PROJO_HOST_MOUNT:/html:ro
     restart: unless-stopped
@@ -157,7 +157,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.projo.entrypoints=websecure
       - traefik.http.routers.projo.middlewares=cacheprivate@docker,japan7@docker
-      - traefik.http.services.projo-docker.loadbalancer.server.port=4507
+      - traefik.http.services.projo-docker.loadbalancer.server.port=8080
 
   projo-dl:
     image: python:alpine
