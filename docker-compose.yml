@@ -34,7 +34,7 @@ services:
       - traefik.http.routers.traefik.service=api@internal
       # Middlewares definitions
       - traefik.http.middlewares.cacheprivate.headers.customresponseheaders.Cache-Control=private
-      - traefik.http.middlewares.noindex.headers.customresponseheaders.X-Robots-Tag=noindex
+      - traefik.http.middlewares.perso.basicauth.users=$PERSO_BASIC_AUTH
       - traefik.http.middlewares.japan7.basicauth.users=$JAPAN7_BASIC_AUTH
 
   watchtower:
@@ -234,7 +234,6 @@ services:
       - traefik.enable=true
       - traefik.http.routers.outline.entrypoints=websecure
       - traefik.http.routers.outline.rule=Host(`docs.$DOMAIN_NAME`)
-      - traefik.http.routers.outline.middlewares=noindex@docker
       - traefik.http.services.outline-docker.loadbalancer.server.port=3000
       # Homepage redirection
       - traefik.http.routers.homepage.entrypoints=websecure
@@ -265,6 +264,33 @@ services:
       - ./borg/cache:/root/.cache/borg # checksums used for deduplication
       - ./rclone:/root/.config/rclone
     restart: unless-stopped
+
+  owntracks-recorder:
+    image: owntracks/recorder:latest
+    hostname: owntracks-recorder
+    environment:
+      - OTR_PORT=0
+    volumes:
+      - ./owntracks-recorder:/store
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.owntracks-recorder.entrypoints=websecure
+      - traefik.http.routers.owntracks-recorder.rule=Host(`owntracks.$DOMAIN_NAME`) && Path(`/pub`)
+      - traefik.http.routers.owntracks-recorder.middlewares=perso@docker
+      - traefik.http.services.owntracks-recorder-docker.loadbalancer.server.port=8083
+
+  owntracks-frontend:
+    image: owntracks/frontend:latest
+    environment:
+      - SERVER_HOST=owntracks-recorder
+      - SERVER_PORT=8083
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.owntracks-frontend.entrypoints=websecure
+      - traefik.http.routers.owntracks-frontend.rule=Host(`owntracks.$DOMAIN_NAME`)
+      - traefik.http.services.owntracks-frontend-docker.loadbalancer.server.port=80
 
 volumes:
   rclone-cache:
