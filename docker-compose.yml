@@ -161,6 +161,7 @@ services:
 
   projo-dl:
     image: python:alpine
+    hostname: $PROJO_HOSTNAME
     entrypoint: crond -f
     volumes:
       - $PROJO_HOST_MOUNT:/projo
