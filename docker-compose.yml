@@ -36,6 +36,17 @@ services:
       - traefik.http.middlewares.cacheprivate.headers.customresponseheaders.Cache-Control=private
       - traefik.http.middlewares.perso.basicauth.users=$PERSO_BASIC_AUTH
       - traefik.http.middlewares.japan7.basicauth.users=$JAPAN7_BASIC_AUTH
+      # Root router
+      - traefik.http.routers.root.entrypoints=websecure
+      - traefik.http.routers.root.rule=Host(`$DOMAIN_NAME`)
+      - traefik.http.routers.root.middlewares=homepage-redirect@docker,webfinger-redirect@docker
+      - traefik.http.routers.root.service=noop@internal
+      - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
+      - traefik.http.middlewares.homepage-redirect.redirectregex.regex=^https://$DOMAIN_NAME/$
+      - traefik.http.middlewares.homepage-redirect.redirectregex.replacement=$HOMEPAGE_REDIRECT_URL
+      - traefik.http.middlewares.webfinger-redirect.redirectregex.permanent=true
+      - traefik.http.middlewares.webfinger-redirect.redirectregex.regex=^https://$DOMAIN_NAME/.well-known/webfinger
+      - traefik.http.middlewares.webfinger-redirect.redirectregex.replacement=https://mastodon.$DOMAIN_NAME/.well-known/webfinger
 
   watchtower:
     image: containrrr/watchtower:latest
@@ -236,14 +247,6 @@ services:
       - traefik.http.routers.outline.entrypoints=websecure
       - traefik.http.routers.outline.rule=Host(`docs.$DOMAIN_NAME`)
       - traefik.http.services.outline-docker.loadbalancer.server.port=3000
-      # Homepage redirection
-      - traefik.http.routers.homepage.entrypoints=websecure
-      - traefik.http.routers.homepage.rule=Host(`$DOMAIN_NAME`)
-      - traefik.http.routers.homepage.middlewares=homepage-redirect@docker
-      - traefik.http.routers.homepage.service=noop@internal
-      - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
-      - traefik.http.middlewares.homepage-redirect.redirectregex.regex=.*
-      - traefik.http.middlewares.homepage-redirect.redirectregex.replacement=$HOMEPAGE_REDIRECT_URL
 
   outline-redis:
     image: redis:alpine
@@ -292,6 +295,53 @@ services:
       - traefik.http.routers.owntracks-frontend.entrypoints=websecure
       - traefik.http.routers.owntracks-frontend.rule=Host(`owntracks.$DOMAIN_NAME`)
       - traefik.http.services.owntracks-frontend-docker.loadbalancer.server.port=80
+
+  mastodon:
+    image: lscr.io/linuxserver/mastodon:glitch
+    environment:
+      - LOCAL_DOMAIN=$DOMAIN_NAME
+      - WEB_DOMAIN=mastodon.$DOMAIN_NAME
+      - SINGLE_USER_MODE=true
+      - SECRET_KEY_BASE=$MASTODON_SECRET_KEY_BASE
+      - OTP_SECRET=$MASTODON_OTP_SECRET
+      - VAPID_PRIVATE_KEY=$MASTODON_VAPID_PRIVATE_KEY
+      - VAPID_PUBLIC_KEY=$MASTODON_VAPID_PUBLIC_KEY
+      - DB_HOST=postgres
+      - DB_NAME=mastodon
+      - DB_USER=$POSTGRES_USER
+      - DB_PASS=$POSTGRES_PASSWORD
+      - REDIS_HOST=mastodon-redis
+      - ES_ENABLED=true
+      - ES_HOST=elasticsearch
+      - SMTP_SERVER=$SMTP_HOST
+      - SMTP_PORT=$SMTP_PORT
+      - SMTP_LOGIN=$SMTP_USERNAME
+      - SMTP_PASSWORD=$SMTP_PASSWORD
+      - SMTP_FROM_ADDRESS=mastodon@$DOMAIN_NAME
+    volumes:
+      - ./mastodon:/config
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mastodon.entrypoints=websecure
+      - traefik.http.routers.mastodon.rule=Host(`mastodon.$DOMAIN_NAME`)
+      - traefik.http.services.mastodon-docker.loadbalancer.server.port=443
+      # https://docs.linuxserver.io/faq#strict-proxy
+      - traefik.http.services.mastodon-docker.loadbalancer.serverstransport=ignorecert@file
+      - traefik.http.services.mastodon-docker.loadbalancer.server.scheme=https
+
+  mastodon-redis:
+    image: redis:alpine
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - ./mastodon-redis:/data
+    restart: unless-stopped
+
+  elasticsearch:
+    image: bitnami/elasticsearch:latest
+    volumes:
+      - ./elasticsearch:/bitnami/elasticsearch/data
+    restart: unless-stopped
 
 volumes:
   rclone-cache:
