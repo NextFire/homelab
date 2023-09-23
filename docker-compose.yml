@@ -188,7 +188,7 @@ services:
       - traefik.http.services.librespeed-docker.loadbalancer.server.port=80
 
   postgres:
-    image: postgres:alpine
+    image: postgres:15-alpine
     environment:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
@@ -250,9 +250,6 @@ services:
 
   outline-redis:
     image: redis:alpine
-    command: redis-server --save 60 1 --loglevel warning
-    volumes:
-      - ./outline-redis:/data
     restart: unless-stopped
 
   borg:
@@ -311,13 +308,14 @@ services:
       - DB_USER=$POSTGRES_USER
       - DB_PASS=$POSTGRES_PASSWORD
       - REDIS_HOST=mastodon-redis
-      - ES_ENABLED=true
-      - ES_HOST=elasticsearch
       - SMTP_SERVER=$SMTP_HOST
       - SMTP_PORT=$SMTP_PORT
       - SMTP_LOGIN=$SMTP_USERNAME
       - SMTP_PASSWORD=$SMTP_PASSWORD
       - SMTP_FROM_ADDRESS=mastodon@$DOMAIN_NAME
+      - SIDEKIQ_THREADS=1
+      - WEB_CONCURRENCY=1
+      - MAX_THREADS=10
     volumes:
       - ./mastodon:/config
     restart: unless-stopped
@@ -332,16 +330,20 @@ services:
 
   mastodon-redis:
     image: redis:alpine
-    command: redis-server --save 60 1 --loglevel warning
-    volumes:
-      - ./mastodon-redis:/data
     restart: unless-stopped
 
-  elasticsearch:
-    image: bitnami/elasticsearch:latest
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    environment:
+      - WEBHOOK_URL=https://n8n.$DOMAIN_NAME
     volumes:
-      - ./elasticsearch:/bitnami/elasticsearch/data
+      - ./n8n:/home/node/.n8n
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.n8n.entrypoints=websecure
+      - traefik.http.routers.n8n.rule=Host(`n8n.$DOMAIN_NAME`)
+      - traefik.http.services.n8n-docker.loadbalancer.server.port=5678
 
 volumes:
   rclone-cache:
