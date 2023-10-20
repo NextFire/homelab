@@ -16,12 +16,14 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
+      - --entrypoints.forgejo-ssh.address=:2222
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.letsencrypt.acme.email=$ACME_EMAIL
       - --certificatesresolvers.letsencrypt.acme.storage=/config/acme.json
     ports:
       - "80:80"
       - "443:443"
+      - "2222:2222"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik:/config
@@ -210,7 +212,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.minio.entrypoints=websecure
-      - traefik.http.routers.minio.rule=Host(`minio.$DOMAIN_NAME`)
       - traefik.http.routers.minio.service=minio-docker
       - traefik.http.services.minio-docker.loadbalancer.server.port=9000
       - traefik.http.routers.minio-ui.entrypoints=websecure
@@ -252,47 +253,6 @@ services:
     image: redis:alpine
     restart: unless-stopped
 
-  borg:
-    image: b3vis/borgmatic:latest
-    hostname: borg
-    environment:
-      - BORG_REPO_REMOTE=$BORG_REPO_REMOTE
-    volumes:
-      - .:/mnt/source:ro # backup source
-      - $BORG_REPO:/mnt/borg-repository # backup target
-      - ./borg/etc:/etc/borgmatic.d/ # borgmatic config file(s) + crontab.txt
-      - ./borg/config:/root/.config/borg # config and keyfiles
-      - ./borg/cache:/root/.cache/borg # checksums used for deduplication
-      - ./rclone:/root/.config/rclone
-    restart: unless-stopped
-
-  owntracks-recorder:
-    image: owntracks/recorder:latest
-    hostname: owntracks-recorder
-    environment:
-      - OTR_PORT=0
-    volumes:
-      - ./owntracks-recorder:/store
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.owntracks-recorder.entrypoints=websecure
-      - traefik.http.routers.owntracks-recorder.rule=Host(`owntracks.$DOMAIN_NAME`) && Path(`/pub`)
-      - traefik.http.routers.owntracks-recorder.middlewares=perso@docker
-      - traefik.http.services.owntracks-recorder-docker.loadbalancer.server.port=8083
-
-  owntracks-frontend:
-    image: owntracks/frontend:latest
-    environment:
-      - SERVER_HOST=owntracks-recorder
-      - SERVER_PORT=8083
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.owntracks-frontend.entrypoints=websecure
-      - traefik.http.routers.owntracks-frontend.rule=Host(`owntracks.$DOMAIN_NAME`)
-      - traefik.http.services.owntracks-frontend-docker.loadbalancer.server.port=80
-
   mastodon:
     image: lscr.io/linuxserver/mastodon:glitch
     environment:
@@ -322,7 +282,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.mastodon.entrypoints=websecure
-      - traefik.http.routers.mastodon.rule=Host(`mastodon.$DOMAIN_NAME`)
       - traefik.http.services.mastodon-docker.loadbalancer.server.port=443
       # https://docs.linuxserver.io/faq#strict-proxy
       - traefik.http.services.mastodon-docker.loadbalancer.serverstransport=ignorecert@file
@@ -331,6 +290,20 @@ services:
   mastodon-redis:
     image: redis:alpine
     restart: unless-stopped
+
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:1.20
+    volumes:
+      - ./forgejo:/data
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.forgejo.entrypoints=websecure
+      - traefik.http.routers.forgejo.rule=Host(`git.$DOMAIN_NAME`)
+      - traefik.http.services.forgejo-docker.loadbalancer.server.port=3000
+      - traefik.tcp.routers.forgejo-ssh.entrypoints=forgejo-ssh
+      - traefik.tcp.routers.forgejo-ssh.rule=HostSNI(`*`)
+      - traefik.tcp.services.forgejo-ssh-docker.loadbalancer.server.port=22
 
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
@@ -342,8 +315,48 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.n8n.entrypoints=websecure
-      - traefik.http.routers.n8n.rule=Host(`n8n.$DOMAIN_NAME`)
       - traefik.http.services.n8n-docker.loadbalancer.server.port=5678
+
+  owntracks-recorder:
+    image: owntracks/recorder:latest
+    hostname: owntracks-recorder
+    environment:
+      - OTR_PORT=0
+    volumes:
+      - ./owntracks-recorder:/store
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.owntracks-recorder.entrypoints=websecure
+      - traefik.http.routers.owntracks-recorder.rule=Host(`owntracks.$DOMAIN_NAME`) && Path(`/pub`)
+      - traefik.http.routers.owntracks-recorder.middlewares=perso@docker
+      - traefik.http.services.owntracks-recorder-docker.loadbalancer.server.port=8083
+
+  owntracks-frontend:
+    image: owntracks/frontend:latest
+    environment:
+      - SERVER_HOST=owntracks-recorder
+      - SERVER_PORT=8083
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.owntracks-frontend.entrypoints=websecure
+      - traefik.http.routers.owntracks-frontend.rule=Host(`owntracks.$DOMAIN_NAME`)
+      - traefik.http.services.owntracks-frontend-docker.loadbalancer.server.port=80
+
+  borg:
+    image: b3vis/borgmatic:latest
+    hostname: borg
+    environment:
+      - BORG_REPO_REMOTE=$BORG_REPO_REMOTE
+    volumes:
+      - .:/mnt/source:ro # backup source
+      - $BORG_REPO:/mnt/borg-repository # backup target
+      - ./borg/etc:/etc/borgmatic.d/ # borgmatic config file(s) + crontab.txt
+      - ./borg/config:/root/.config/borg # config and keyfiles
+      - ./borg/cache:/root/.cache/borg # checksums used for deduplication
+      - ./rclone:/root/.config/rclone
+    restart: unless-stopped
 
 volumes:
   rclone-cache:
