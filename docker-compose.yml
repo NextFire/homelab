@@ -199,8 +199,8 @@ services:
       - KEYCLOAK_DATABASE_USER=$POSTGRES_USER
       - KEYCLOAK_DATABASE_PASSWORD=$POSTGRES_PASSWORD
       - KEYCLOAK_DATABASE_NAME=keycloak
-    volumes:
-      - ./keycloak/providers/keycloak-discord-0.4.0.jar:/opt/bitnami/keycloak/providers/keycloak-discord-0.4.0.jar:ro
+      - KEYCLOAK_PRODUCTION=true
+      - KEYCLOAK_PROXY=edge
     restart: unless-stopped
     labels:
       - traefik.enable=true
