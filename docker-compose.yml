@@ -33,11 +33,14 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.middlewares=traefik-forward-auth@docker
       - traefik.http.routers.traefik.service=api@internal
       # Middlewares definitions
       - traefik.http.middlewares.cacheprivate.headers.customresponseheaders.Cache-Control=private
       - traefik.http.middlewares.perso.basicauth.users=$PERSO_BASIC_AUTH
       - traefik.http.middlewares.japan7.basicauth.users=$JAPAN7_BASIC_AUTH
+      - traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181
+      - traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User
       # Root router
       - traefik.http.routers.root.entrypoints=websecure
       - traefik.http.routers.root.rule=Host(`$DOMAIN_NAME`)
@@ -60,9 +63,6 @@ services:
       - CLIENT_SECRET=$TFA_CLIENT_SECRET
       - SCOPE="openid profile email"
     restart: unless-stopped
-    labels:
-      - traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181
-      - traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User
 
   watchtower:
     image: containrrr/watchtower:latest
@@ -138,6 +138,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.qbittorrent.entrypoints=websecure
+      - traefik.http.routers.qbittorrent.middlewares=traefik-forward-auth@docker
       - traefik.http.services.qbittorrent-docker.loadbalancer.server.port=8080
 
   filebot:
@@ -149,6 +150,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.filebot.entrypoints=websecure
+      - traefik.http.routers.filebot.middlewares=traefik-forward-auth@docker
       - traefik.http.services.filebot-docker.loadbalancer.server.port=5800
 
   mkvtoolnix:
@@ -160,6 +162,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.mkvtoolnix.entrypoints=websecure
+      - traefik.http.routers.mkvtoolnix.middlewares=traefik-forward-auth@docker
       - traefik.http.services.mkvtoolnix-docker.loadbalancer.server.port=5800
 
   files:
@@ -344,6 +347,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.owntracks-frontend.entrypoints=websecure
       - traefik.http.routers.owntracks-frontend.rule=Host(`owntracks.$DOMAIN_NAME`)
+      - traefik.http.routers.owntracks-frontend.middlewares=traefik-forward-auth@docker
       - traefik.http.services.owntracks-frontend-docker.loadbalancer.server.port=80
 
   borg:
