@@ -181,14 +181,6 @@ services:
       - ./projo:/etc/periodic/hourly:ro
     restart: unless-stopped
 
-  librespeed:
-    image: lscr.io/linuxserver/librespeed:latest
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.librespeed.entrypoints=websecure
-      - traefik.http.services.librespeed-docker.loadbalancer.server.port=80
-
   postgres:
     image: postgres:15-alpine
     environment:
