@@ -64,18 +64,6 @@ services:
       - SCOPE=openid profile email
     restart: unless-stopped
 
-  watchtower:
-    image: containrrr/watchtower:latest
-    command:
-      - --cleanup
-      - --notifications=shoutrrr
-      - --notification-url=$NOTIFICATION_URL
-      - --no-startup-message
-      - "--schedule=0 0 6 * * *"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
-
   rclone:
     image: rclone/rclone:1.62
     command: mount $RCLONE_REMOTE /remote --vfs-cache-mode full --cache-dir /cache --transfers 50 --checkers 100 --allow-other --allow-non-empty --verbose
@@ -363,6 +351,18 @@ services:
       - ./borg/config:/root/.config/borg # config and keyfiles
       - ./borg/cache:/root/.cache/borg # checksums used for deduplication
       - ./rclone:/root/.config/rclone
+    restart: unless-stopped
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    command:
+      - --cleanup
+      - --notifications=shoutrrr
+      - --notification-url=$NOTIFICATION_URL
+      - --no-startup-message
+      - "--schedule=0 0 6 * * *"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
 volumes:
