@@ -116,6 +116,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.tautulli.entrypoints=websecure
+      - traefik.http.routers.tautulli.middlewares=traefik-forward-auth@docker
       - traefik.http.services.tautulli-docker.loadbalancer.server.port=8181
 
   flexget:
