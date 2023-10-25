@@ -180,24 +180,15 @@ services:
       - ./projo:/etc/periodic/hourly:ro
     restart: unless-stopped
 
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_USER=$POSTGRES_USER
-      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-    volumes:
-      - ./postgres:/var/lib/postgresql/data
-    restart: unless-stopped
-
   keycloak:
     image: bitnami/keycloak:latest
     environment:
       - KEYCLOAK_ADMIN_USER=$KEYCLOAK_ADMIN_USER
       - KEYCLOAK_ADMIN_PASSWORD=$KEYCLOAK_ADMIN_PASSWORD
-      - KEYCLOAK_DATABASE_HOST=postgres
+      - KEYCLOAK_DATABASE_HOST=keycloak-postgres
+      - KEYCLOAK_DATABASE_NAME=postgres
       - KEYCLOAK_DATABASE_USER=$POSTGRES_USER
       - KEYCLOAK_DATABASE_PASSWORD=$POSTGRES_PASSWORD
-      - KEYCLOAK_DATABASE_NAME=keycloak
       - KEYCLOAK_PRODUCTION=true
       - KEYCLOAK_PROXY=edge
     restart: unless-stopped
@@ -205,6 +196,15 @@ services:
       - traefik.enable=true
       - traefik.http.routers.keycloak.entrypoints=websecure
       - traefik.http.services.keycloak-docker.loadbalancer.server.port=8080
+
+  keycloak-postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - ./keycloak-postgres:/var/lib/postgresql/data
+    restart: unless-stopped
 
   outline:
     image: outlinewiki/outline:latest
@@ -217,6 +217,15 @@ services:
       - traefik.http.routers.outline.entrypoints=websecure
       - traefik.http.routers.outline.rule=Host(`docs.$DOMAIN_NAME`)
       - traefik.http.services.outline-docker.loadbalancer.server.port=3000
+
+  outline-postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - ./outline-postgres:/var/lib/postgresql/data
+    restart: unless-stopped
 
   outline-redis:
     image: redis:alpine
@@ -232,8 +241,8 @@ services:
       - OTP_SECRET=$MASTODON_OTP_SECRET
       - VAPID_PRIVATE_KEY=$MASTODON_VAPID_PRIVATE_KEY
       - VAPID_PUBLIC_KEY=$MASTODON_VAPID_PUBLIC_KEY
-      - DB_HOST=postgres
-      - DB_NAME=mastodon
+      - DB_HOST=mastodon-postgres
+      - DB_NAME=postgres
       - DB_USER=$POSTGRES_USER
       - DB_PASS=$POSTGRES_PASSWORD
       - REDIS_HOST=mastodon-redis
@@ -255,6 +264,15 @@ services:
       # https://docs.linuxserver.io/faq#strict-proxy
       - traefik.http.services.mastodon-docker.loadbalancer.serverstransport=ignorecert@file
       - traefik.http.services.mastodon-docker.loadbalancer.server.scheme=https
+
+  mastodon-postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - ./mastodon-postgres:/var/lib/postgresql/data
+    restart: unless-stopped
 
   mastodon-redis:
     image: redis:alpine
