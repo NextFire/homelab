@@ -36,6 +36,7 @@ services:
       - traefik.http.routers.traefik.service=api@internal
       # Middlewares definitions
       - traefik.http.middlewares.cacheprivate.headers.customresponseheaders.Cache-Control=private
+      - traefik.http.middlewares.perso.basicauth.users=$PERSO_BASIC_AUTH
       - traefik.http.middlewares.japan7.basicauth.users=$JAPAN7_BASIC_AUTH
       # Root router
       - traefik.http.routers.root.entrypoints=websecure
