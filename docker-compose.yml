@@ -61,7 +61,7 @@ services:
       - PROVIDER_URI=https://keycloak.$DOMAIN_NAME/realms/$TFA_REALM
       - CLIENT_ID=$TFA_CLIENT_ID
       - CLIENT_SECRET=$TFA_CLIENT_SECRET
-      - SCOPE="openid profile email"
+      - SCOPE=openid profile email
     restart: unless-stopped
 
   watchtower:
