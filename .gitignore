@@ -19,3 +19,7 @@
 !qbittorrent/scripts/*.py
 !rclone/
 !rclone/index.html
+!rclone-nfs/
+!rclone-nfs/Dockerfile
+!rclone-nfs/rclone.sh
+!rclone-nfs/supervisord.conf

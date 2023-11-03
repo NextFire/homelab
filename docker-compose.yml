@@ -16,6 +16,7 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
+      - --entrypoints.rclone-nfs.address=:2049
       - --entrypoints.forgejo-ssh.address=:9022
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.letsencrypt.acme.email=$ACME_EMAIL
@@ -23,6 +24,7 @@ services:
     ports:
       - "80:80/tcp"
       - "443:443/tcp"
+      - "2049:2049/tcp"
       - "9022:9022/tcp"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -41,6 +43,7 @@ services:
       - traefik.http.middlewares.japan7.basicauth.users=$JAPAN7_BASIC_AUTH
       - traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181
       - traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User
+      - traefik.tcp.middlewares.rclone-nfs-ipwhitelist.ipwhitelist.sourcerange=$RCLONE_NFS_IP_WHITELIST
       # Root router
       - traefik.http.routers.root.entrypoints=websecure
       - traefik.http.routers.root.rule=Host(`$DOMAIN_NAME`)
@@ -350,6 +353,28 @@ services:
       - traefik.http.routers.owntracks-frontend.middlewares=traefik-forward-auth@docker
       - traefik.http.services.owntracks-frontend-docker.loadbalancer.server.port=80
 
+  rclone-nfs:
+    image: rclone-nfs:latest
+    build: rclone-nfs
+    environment:
+      - RCLONE_REMOTE=$RCLONE_NFS_REMOTE
+      - RCLONE_OPTS=--transfers 50 --checkers 100
+    volumes:
+      - ./rclone:/config/rclone
+      - rclone-cache:/cache
+    devices:
+      - /dev/fuse
+    cap_add:
+      - SYS_ADMIN
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.tcp.routers.rclone-nfs.entrypoints=rclone-nfs
+      - traefik.tcp.routers.rclone-nfs.rule=HostSNI(`*`)
+      - traefik.tcp.routers.rclone-nfs.middlewares=rclone-nfs-ipwhitelist@docker
+      - traefik.tcp.services.rclone-nfs-docker.loadbalancer.server.port=2049
+      - com.centurylinklabs.watchtower.enable=false
+
   borg:
     image: b3vis/borgmatic:latest
     hostname: borg
@@ -378,3 +403,4 @@ services:
 
 volumes:
   rclone-cache:
+  rclone-nfs-cache:
