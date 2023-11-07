@@ -47,14 +47,16 @@ services:
       # Root router
       - traefik.http.routers.root.entrypoints=websecure
       - traefik.http.routers.root.rule=Host(`$DOMAIN_NAME`)
-      - traefik.http.routers.root.middlewares=homepage-redirect@docker,webfinger-redirect@docker
+      - traefik.http.routers.root.middlewares=webfinger-redirect@docker,homepage-redirect@docker,docs-redirect@docker
       - traefik.http.routers.root.service=noop@internal
-      - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
-      - traefik.http.middlewares.homepage-redirect.redirectregex.regex=^https://$DOMAIN_NAME/$
-      - traefik.http.middlewares.homepage-redirect.redirectregex.replacement=$HOMEPAGE_REDIRECT_URL
-      - traefik.http.middlewares.webfinger-redirect.redirectregex.permanent=true
       - traefik.http.middlewares.webfinger-redirect.redirectregex.regex=^https://$DOMAIN_NAME/.well-known/webfinger
       - traefik.http.middlewares.webfinger-redirect.redirectregex.replacement=https://mastodon.$DOMAIN_NAME/.well-known/webfinger
+      - traefik.http.middlewares.webfinger-redirect.redirectregex.permanent=true
+      - traefik.http.middlewares.homepage-redirect.redirectregex.regex=^https://$DOMAIN_NAME/$
+      - traefik.http.middlewares.homepage-redirect.redirectregex.replacement=$HOMEPAGE_REDIRECT_URL
+      - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
+      - traefik.http.middlewares.docs-redirect.redirectregex.regex=^https://$DOMAIN_NAME/(.*)
+      - traefik.http.middlewares.docs-redirect.redirectregex.replacement=https://docs.$DOMAIN_NAME/s/$${1}
 
   traefik-forward-auth:
     image: ghcr.io/japan7/traefik-forward-auth:master
@@ -358,12 +360,12 @@ services:
     build: rclone-nfs
     environment:
       - RCLONE_REMOTE=$RCLONE_NFS_REMOTE
-      - RCLONE_OPTS=--transfers 50 --checkers 100
+      - RCLONE_OPTS=--transfers 50 --checkers 100 --vfs-cache-max-age 5m
     ports:
       - "$RCLONE_NFS_HOST:2049:2049/tcp"
     volumes:
       - ./rclone:/config/rclone
-      - rclone-cache:/cache
+      - rclone-nfs-cache:/cache
     devices:
       - /dev/fuse
     cap_add:
