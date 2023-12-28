@@ -1,0 +1,26 @@
+services:
+  dendrite:
+    image: matrixdotorg/dendrite-monolith:latest
+    volumes:
+      - ./.volumes/dendrite/config:/etc/dendrite
+      - ./.volumes/dendrite/config:/var/dendrite/media
+      - ./.volumes/dendrite/jetstream:/var/dendrite/jetstream
+      - ./.volumes/dendrite/searchindex:/var/dendrite/searchindex
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dendrite.entrypoints=websecure
+      - traefik.http.routers.dendrite.rule=Host(`matrix.$DOMAIN_NAME`)
+      - traefik.http.services.dendrite-docker.loadbalancer.server.port=8008
+      - traefik.http.routers.matrix-delegation.entrypoints=websecure
+      - traefik.http.routers.matrix-delegation.rule=Host(`$DOMAIN_NAME`) && PathPrefix(`/.well-known/matrix`)
+      - traefik.http.routers.matrix-delegation.service=dendrite-docker
+
+  dendrite-postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - ./.volumes/dendrite-postgres:/var/lib/postgresql/data
+    restart: unless-stopped
