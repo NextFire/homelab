@@ -14,7 +14,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.forgejo.entrypoints=websecure
-      - traefik.http.routers.forgejo.rule=Host(`git.$DOMAIN_NAME`)
+      - traefik.http.routers.forgejo.rule=Host(`git.$DOMAIN`)
       - traefik.http.services.forgejo-docker.loadbalancer.server.port=3000
       - traefik.tcp.routers.forgejo-ssh.entrypoints=forgejo-ssh
       - traefik.tcp.routers.forgejo-ssh.rule=HostSNI(`*`)
@@ -23,7 +23,7 @@ services:
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
     environment:
-      - WEBHOOK_URL=https://n8n.$DOMAIN_NAME
+      - WEBHOOK_URL=https://n8n.$DOMAIN
     volumes:
       - ./.volumes/n8n:/home/node/.n8n
     restart: unless-stopped

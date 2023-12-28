@@ -9,7 +9,7 @@ services:
       - --api.dashboard=true
       - --providers.docker=true
       - --providers.docker.exposedByDefault=false
-      - --providers.docker.defaultRule=Host(`{{ .Name | trimSuffix "-docker" | normalize }}.$DOMAIN_NAME`)
+      - --providers.docker.defaultRule=Host(`{{ .Name | trimSuffix "-docker" | normalize }}.$DOMAIN`)
       - --providers.file.directory=/config
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
@@ -38,14 +38,14 @@ services:
       - traefik.http.routers.traefik.service=api@internal
       # Root router
       - traefik.http.routers.root.entrypoints=websecure
-      - traefik.http.routers.root.rule=Host(`$DOMAIN_NAME`)
+      - traefik.http.routers.root.rule=Host(`$DOMAIN`)
       - traefik.http.routers.root.middlewares=homepage-redirect@docker
       - traefik.http.routers.root.service=noop@internal
       - traefik.http.middlewares.homepage-redirect.redirectregex.regex=.*
       - traefik.http.middlewares.homepage-redirect.redirectregex.replacement=$HOMEPAGE_REDIRECT_URL
       - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
       # Middlewares
-      - traefik.http.middlewares.cacheprivate.headers.customresponseheaders.Cache-Control=private
+      - traefik.http.middlewares.cache-control-private.headers.customresponseheaders.Cache-Control=private
       - traefik.http.middlewares.perso-basic-auth.basicauth.users=$PERSO_BASIC_AUTH
       - traefik.http.middlewares.japan7-basic-auth.basicauth.users=$JAPAN7_BASIC_AUTH
       - traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181
@@ -56,7 +56,7 @@ services:
     environment:
       - SECRET=$TFA_SECRET
       - ENCRYPTION_KEY=$TFA_ENCRYPTION_KEY
-      - PROVIDER_URI=https://keycloak.$DOMAIN_NAME/realms/$TFA_REALM
+      - PROVIDER_URI=https://keycloak.$DOMAIN/realms/$TFA_REALM
       - CLIENT_ID=$TFA_CLIENT_ID
       - CLIENT_SECRET=$TFA_CLIENT_SECRET
       - SCOPE=openid profile email

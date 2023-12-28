@@ -10,10 +10,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.dendrite.entrypoints=websecure
-      - traefik.http.routers.dendrite.rule=Host(`matrix.$DOMAIN_NAME`)
+      - traefik.http.routers.dendrite.rule=Host(`matrix.$DOMAIN`)
       - traefik.http.services.dendrite-docker.loadbalancer.server.port=8008
       - traefik.http.routers.matrix-delegation.entrypoints=websecure
-      - traefik.http.routers.matrix-delegation.rule=Host(`$DOMAIN_NAME`) && PathPrefix(`/.well-known/matrix`)
+      - traefik.http.routers.matrix-delegation.rule=Host(`$DOMAIN`) && PathPrefix(`/.well-known/matrix`)
       - traefik.http.routers.matrix-delegation.service=dendrite-docker
 
   dendrite-postgres:

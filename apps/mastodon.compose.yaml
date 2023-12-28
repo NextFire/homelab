@@ -2,8 +2,8 @@ services:
   mastodon:
     image: lscr.io/linuxserver/mastodon:glitch
     environment:
-      - LOCAL_DOMAIN=$DOMAIN_NAME
-      - WEB_DOMAIN=mastodon.$DOMAIN_NAME
+      - LOCAL_DOMAIN=$DOMAIN
+      - WEB_DOMAIN=mastodon.$DOMAIN
       - SINGLE_USER_MODE=true
       - SECRET_KEY_BASE=$MASTODON_SECRET_KEY_BASE
       - OTP_SECRET=$MASTODON_OTP_SECRET
@@ -18,7 +18,7 @@ services:
       - SMTP_PORT=$SMTP_PORT
       - SMTP_LOGIN=$SMTP_USERNAME
       - SMTP_PASSWORD=$SMTP_PASSWORD
-      - SMTP_FROM_ADDRESS=mastodon@$DOMAIN_NAME
+      - SMTP_FROM_ADDRESS=mastodon@$DOMAIN
       - SIDEKIQ_THREADS=1
       - WEB_CONCURRENCY=1
       - MAX_THREADS=10
@@ -33,7 +33,7 @@ services:
       - traefik.http.services.mastodon-docker.loadbalancer.serverstransport=ignorecert@file
       - traefik.http.services.mastodon-docker.loadbalancer.server.scheme=https
       - traefik.http.routers.mastodon-webfinger.entrypoints=websecure
-      - traefik.http.routers.mastodon-webfinger.rule=Host(`$DOMAIN_NAME`) && Path(`/.well-known/webfinger`)
+      - traefik.http.routers.mastodon-webfinger.rule=Host(`$DOMAIN`) && Path(`/.well-known/webfinger`)
       - traefik.http.routers.mastodon-webfinger.service=mastodon-docker
 
   mastodon-postgres:

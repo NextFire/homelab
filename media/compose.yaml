@@ -28,7 +28,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.plex.entrypoints=websecure
-      - traefik.http.routers.plex.middlewares=cacheprivate@docker
+      - traefik.http.routers.plex.middlewares=cache-control-private@docker
       - traefik.http.services.plex-docker.loadbalancer.server.port=32400
 
   tautulli:

@@ -10,7 +10,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.owntracks-recorder.entrypoints=websecure
-      - traefik.http.routers.owntracks-recorder.rule=Host(`owntracks.$DOMAIN_NAME`) && Path(`/pub`)
+      - traefik.http.routers.owntracks-recorder.rule=Host(`owntracks.$DOMAIN`) && Path(`/pub`)
       - traefik.http.routers.owntracks-recorder.middlewares=perso-basic-auth@docker
       - traefik.http.services.owntracks-recorder-docker.loadbalancer.server.port=8083
 
@@ -23,6 +23,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.owntracks-frontend.entrypoints=websecure
-      - traefik.http.routers.owntracks-frontend.rule=Host(`owntracks.$DOMAIN_NAME`)
+      - traefik.http.routers.owntracks-frontend.rule=Host(`owntracks.$DOMAIN`)
       - traefik.http.routers.owntracks-frontend.middlewares=traefik-forward-auth@docker
       - traefik.http.services.owntracks-frontend-docker.loadbalancer.server.port=80

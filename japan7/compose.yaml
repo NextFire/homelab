@@ -9,7 +9,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.files.entrypoints=websecure
-      - traefik.http.routers.files.middlewares=cacheprivate@docker,japan7-basic-auth@docker
+      - traefik.http.routers.files.middlewares=cache-control-private@docker,japan7-basic-auth@docker
       - traefik.http.services.files-docker.loadbalancer.server.port=8080
 
   projo:
@@ -21,7 +21,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.projo.entrypoints=websecure
-      - traefik.http.routers.projo.middlewares=cacheprivate@docker,japan7-basic-auth@docker
+      - traefik.http.routers.projo.middlewares=cache-control-private@docker,japan7-basic-auth@docker
       - traefik.http.services.projo-docker.loadbalancer.server.port=8080
 
   projo-dl:
