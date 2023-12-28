@@ -1,10 +1,9 @@
 services:
   files:
     image: rclone/rclone:latest
-    command: serve http $RCLONE_REMOTE --addr :8080 --template /template/index.html --verbose
+    command: serve http $RCLONE_REMOTE --addr :8080 --template /config/rclone/index.html --verbose
     volumes:
       - ../.shared/rclone:/config/rclone
-      - ./rclone/template:/template:ro
     restart: unless-stopped
     labels:
       - traefik.enable=true
