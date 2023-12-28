@@ -39,26 +39,17 @@ services:
       # Root router
       - traefik.http.routers.root.entrypoints=websecure
       - traefik.http.routers.root.rule=Host(`$DOMAIN_NAME`)
-      - traefik.http.routers.root.middlewares=homepage-redirect@docker,mastodon-webfinger-redirect@docker,outline-redirect@docker
+      - traefik.http.routers.root.middlewares=homepage-redirect@docker
       - traefik.http.routers.root.service=noop@internal
+      - traefik.http.middlewares.homepage-redirect.redirectregex.regex=.*
+      - traefik.http.middlewares.homepage-redirect.redirectregex.replacement=$HOMEPAGE_REDIRECT_URL
+      - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
       # Middlewares
-      ## Headers
       - traefik.http.middlewares.cacheprivate.headers.customresponseheaders.Cache-Control=private
       - traefik.http.middlewares.perso-basic-auth.basicauth.users=$PERSO_BASIC_AUTH
       - traefik.http.middlewares.japan7-basic-auth.basicauth.users=$JAPAN7_BASIC_AUTH
       - traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181
       - traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User
-      ## Homepage
-      - traefik.http.middlewares.homepage-redirect.redirectregex.regex=^https://$DOMAIN_NAME/$
-      - traefik.http.middlewares.homepage-redirect.redirectregex.replacement=$HOMEPAGE_REDIRECT_URL
-      - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
-      ## Mastodon webfinger
-      - traefik.http.middlewares.mastodon-webfinger-redirect.redirectregex.regex=^https://$DOMAIN_NAME/.well-known/webfinger
-      - traefik.http.middlewares.mastodon-webfinger-redirect.redirectregex.replacement=https://mastodon.$DOMAIN_NAME/.well-known/webfinger
-      - traefik.http.middlewares.mastodon-webfinger-redirect.redirectregex.permanent=true
-      ## Outline catchall
-      - traefik.http.middlewares.outline-redirect.redirectregex.regex=^https://$DOMAIN_NAME/(.*)
-      - traefik.http.middlewares.outline-redirect.redirectregex.replacement=https://docs.$DOMAIN_NAME/s/$${1}
 
   traefik-forward-auth:
     image: ghcr.io/japan7/traefik-forward-auth:master

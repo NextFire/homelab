@@ -32,6 +32,9 @@ services:
       # https://docs.linuxserver.io/faq#strict-proxy
       - traefik.http.services.mastodon-docker.loadbalancer.serverstransport=ignorecert@file
       - traefik.http.services.mastodon-docker.loadbalancer.server.scheme=https
+      - traefik.http.routers.mastodon-webfinger.entrypoints=websecure
+      - traefik.http.routers.mastodon-webfinger.rule=Host(`$DOMAIN_NAME`) && Path(`/.well-known/webfinger`)
+      - traefik.http.routers.mastodon-webfinger.service=mastodon-docker
 
   mastodon-postgres:
     image: postgres:15-alpine
