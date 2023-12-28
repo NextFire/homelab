@@ -1,0 +1,25 @@
+services:
+  outline:
+    image: outlinewiki/outline:latest
+    env_file: ./.outline.env
+    volumes:
+      - ./.volumes/outline:/var/lib/outline/data
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.outline.entrypoints=websecure
+      - traefik.http.routers.outline.rule=Host(`docs.$DOMAIN_NAME`)
+      - traefik.http.services.outline-docker.loadbalancer.server.port=3000
+
+  outline-postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - ./.volumes/outline-postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  outline-redis:
+    image: redis:alpine
+    restart: unless-stopped

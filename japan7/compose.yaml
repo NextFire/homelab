@@ -1,0 +1,56 @@
+services:
+  files:
+    image: rclone/rclone:latest
+    command: serve http $RCLONE_REMOTE --addr :8080 --template /template/index.html --verbose
+    volumes:
+      - ../.shared/rclone:/config/rclone
+      - ./rclone/template:/template:ro
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.files.entrypoints=websecure
+      - traefik.http.routers.files.middlewares=cacheprivate@docker,japan7@docker
+      - traefik.http.services.files-docker.loadbalancer.server.port=8080
+
+  projo:
+    image: svenstaro/miniserve:alpine
+    command: /html
+    volumes:
+      - $PROJO_HOST_MOUNT:/html:ro
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.projo.entrypoints=websecure
+      - traefik.http.routers.projo.middlewares=cacheprivate@docker,japan7@docker
+      - traefik.http.services.projo-docker.loadbalancer.server.port=8080
+
+  projo-dl:
+    image: python:alpine
+    hostname: $PROJO_HOSTNAME
+    entrypoint: crond -f
+    volumes:
+      - $PROJO_HOST_MOUNT:/projo
+      - ./projo:/etc/periodic/hourly:ro
+    restart: unless-stopped
+
+  rclone-nfs:
+    image: rclone-nfs:latest
+    build: rclone-nfs
+    environment:
+      - RCLONE_REMOTE=$RCLONE_NFS_REMOTE
+      - RCLONE_OPTS=--transfers 50 --checkers 100 --vfs-cache-max-age 5m
+    ports:
+      - "$RCLONE_NFS_HOST:2049:2049/tcp"
+    volumes:
+      - ../.shared/rclone:/config/rclone
+      - rclone-nfs-cache:/cache
+    devices:
+      - /dev/fuse
+    cap_add:
+      - SYS_ADMIN
+    restart: unless-stopped
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
+
+volumes:
+  rclone-nfs-cache:

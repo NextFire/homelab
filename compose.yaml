@@ -1,0 +1,5 @@
+include:
+  - apps/compose.yaml
+  - japan7/compose.yaml
+  - media/compose.yaml
+  - system/compose.yaml

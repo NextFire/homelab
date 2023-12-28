@@ -1,0 +1,28 @@
+services:
+  owntracks-recorder:
+    image: owntracks/recorder:latest
+    hostname: owntracks-recorder
+    environment:
+      - OTR_PORT=0
+    volumes:
+      - ./.volumes/owntracks-recorder:/store
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.owntracks-recorder.entrypoints=websecure
+      - traefik.http.routers.owntracks-recorder.rule=Host(`owntracks.$DOMAIN_NAME`) && Path(`/pub`)
+      - traefik.http.routers.owntracks-recorder.middlewares=perso@docker
+      - traefik.http.services.owntracks-recorder-docker.loadbalancer.server.port=8083
+
+  owntracks-frontend:
+    image: owntracks/frontend:latest
+    environment:
+      - SERVER_HOST=owntracks-recorder
+      - SERVER_PORT=8083
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.owntracks-frontend.entrypoints=websecure
+      - traefik.http.routers.owntracks-frontend.rule=Host(`owntracks.$DOMAIN_NAME`)
+      - traefik.http.routers.owntracks-frontend.middlewares=traefik-forward-auth@docker
+      - traefik.http.services.owntracks-frontend-docker.loadbalancer.server.port=80

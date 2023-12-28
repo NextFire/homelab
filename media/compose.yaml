@@ -1,0 +1,94 @@
+services:
+  rclone:
+    image: rclone/rclone:1.62
+    command: mount $RCLONE_REMOTE /remote --vfs-cache-mode full --cache-dir /cache --transfers 50 --checkers 100 --allow-other --allow-non-empty --verbose
+    volumes:
+      - ../.shared/rclone:/config/rclone
+      - rclone-cache:/cache
+      - $RCLONE_HOST_MOUNT:/remote:shared
+    devices:
+      - /dev/fuse
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    restart: unless-stopped
+    labels:
+      - com.centurylinklabs.watchtower.monitor-only=true
+
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    environment:
+      - VERSION=docker
+      - DOCKER_MODS=linuxserver/mods:plex-absolute-hama
+    volumes:
+      - ./.volumes/plex:/config
+      - $RCLONE_HOST_MOUNT:$MEDIA_MOUNT:ro,slave
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.plex.entrypoints=websecure
+      - traefik.http.routers.plex.middlewares=cacheprivate@docker
+      - traefik.http.services.plex-docker.loadbalancer.server.port=32400
+
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    volumes:
+      - ./.volumes/tautulli:/config
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tautulli.entrypoints=websecure
+      - traefik.http.routers.tautulli.middlewares=traefik-forward-auth@docker
+      - traefik.http.services.tautulli-docker.loadbalancer.server.port=8181
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    volumes:
+      - ./.volumes/qbittorrent:/config
+      - ./qbittorrent/scripts:/config/scripts:ro
+      - $RCLONE_HOST_MOUNT:/downloads:slave
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.qbittorrent.entrypoints=websecure
+      - traefik.http.routers.qbittorrent.middlewares=traefik-forward-auth@docker
+      - traefik.http.services.qbittorrent-docker.loadbalancer.server.port=8080
+
+  flexget:
+    image: flexget/flexget:latest
+    command: daemon start --autoreload-config
+    volumes:
+      - ./.volumes/flexget:/config
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.flexget.entrypoints=websecure
+      - traefik.http.services.flexget-docker.loadbalancer.server.port=5050
+
+  filebot:
+    image: jlesage/filebot:latest
+    volumes:
+      - ./.volumes/filebot:/config
+      - $RCLONE_HOST_MOUNT:/storage:slave
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.filebot.entrypoints=websecure
+      - traefik.http.routers.filebot.middlewares=traefik-forward-auth@docker
+      - traefik.http.services.filebot-docker.loadbalancer.server.port=5800
+
+  mkvtoolnix:
+    image: jlesage/mkvtoolnix:latest
+    volumes:
+      - ./.volumes/mkvtoolnix:/config
+      - $RCLONE_HOST_MOUNT:/storage:slave
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mkvtoolnix.entrypoints=websecure
+      - traefik.http.routers.mkvtoolnix.middlewares=traefik-forward-auth@docker
+      - traefik.http.services.mkvtoolnix-docker.loadbalancer.server.port=5800
+
+volumes:
+  rclone-cache:

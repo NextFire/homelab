@@ -1,0 +1,32 @@
+include:
+  - keycloak.compose.yaml
+  - mastodon.compose.yaml
+  - outline.compose.yaml
+  - owntracks.compose.yaml
+
+services:
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:1.20
+    volumes:
+      - ./.volumes/forgejo:/data
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.forgejo.entrypoints=websecure
+      - traefik.http.routers.forgejo.rule=Host(`git.$DOMAIN_NAME`)
+      - traefik.http.services.forgejo-docker.loadbalancer.server.port=3000
+      - traefik.tcp.routers.forgejo-ssh.entrypoints=forgejo-ssh
+      - traefik.tcp.routers.forgejo-ssh.rule=HostSNI(`*`)
+      - traefik.tcp.services.forgejo-ssh-docker.loadbalancer.server.port=22
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    environment:
+      - WEBHOOK_URL=https://n8n.$DOMAIN_NAME
+    volumes:
+      - ./.volumes/n8n:/home/node/.n8n
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.n8n.entrypoints=websecure
+      - traefik.http.services.n8n-docker.loadbalancer.server.port=5678
