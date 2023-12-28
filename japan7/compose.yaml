@@ -52,5 +52,17 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=false
 
+  # aoc:
+  #   image: denoland/deno:alpine
+  #   command:
+  #     - run
+  #     - -A
+  #     - /app/main.ts
+  #   volumes:
+  #     - ./.volumes/aoc:/app
+  #   restart: unless-stopped
+  #   labels:
+  #     - com.centurylinklabs.watchtower.enable=false
+
 volumes:
   rclone-nfs-cache:
