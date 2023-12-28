@@ -85,5 +85,5 @@ services:
       - ./borg/etc:/etc/borgmatic.d/:ro # borgmatic config file(s) + crontab.txt
       - ./.volumes/borg/config:/root/.config/borg # config and keyfiles
       - ./.volumes/borg/cache:/root/.cache/borg # checksums used for deduplication
-      - ./.volumes/rclone:/root/.config/rclone
+      - ../.shared/rclone:/root/.config/rclone
     restart: unless-stopped
