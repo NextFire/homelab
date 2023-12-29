@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:latest
+    image: traefik:v3.0
     environment:
       - CLOUDFLARE_DNS_API_TOKEN=$CLOUDFLARE_DNS_API_TOKEN
     command:
@@ -16,16 +16,18 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
+      - --entrypoints.websecure.http3=true
       - --entrypoints.rclone-nfs.address=:2049
       - --entrypoints.forgejo-ssh.address=:9022
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.letsencrypt.acme.email=$ACME_EMAIL
       - --certificatesresolvers.letsencrypt.acme.storage=/config/acme.json
     ports:
-      - "80:80"
-      - "443:443"
-      - "2049:2049"
-      - "9022:9022"
+      - "80:80/tcp"
+      - "443:443/tcp"
+      - "443:443/udp"
+      - "2049:2049/tcp"
+      - "9022:9022/tcp"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./.volumes/traefik:/config

@@ -52,9 +52,9 @@ services:
       - traefik.enable=true
       - traefik.tcp.routers.rclone-nfs.entrypoints=rclone-nfs
       - traefik.tcp.routers.rclone-nfs.rule=HostSNI(`*`)
-      - traefik.tcp.routers.rclone-nfs.middlewares=rclone-nfs-ipwhitelist@docker
+      - traefik.tcp.routers.rclone-nfs.middlewares=rclone-nfs-ipallowlist@docker
       - traefik.tcp.services.rclone-nfs-docker.loadbalancer.server.port=2049
-      - traefik.tcp.middlewares.rclone-nfs-ipwhitelist.ipwhitelist.sourcerange=$RCLONE_NFS_IP_ALLOWLIST
+      - traefik.tcp.middlewares.rclone-nfs-ipallowlist.ipallowlist.sourcerange=$RCLONE_NFS_IP_ALLOWLIST
       - com.centurylinklabs.watchtower.enable=false
 
   # aoc:
