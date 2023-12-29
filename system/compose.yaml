@@ -16,14 +16,16 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
+      - --entrypoints.rclone-nfs.address=:2049
       - --entrypoints.forgejo-ssh.address=:9022
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.letsencrypt.acme.email=$ACME_EMAIL
       - --certificatesresolvers.letsencrypt.acme.storage=/config/acme.json
     ports:
-      - "80:80/tcp"
-      - "443:443/tcp"
-      - "9022:9022/tcp"
+      - "80:80"
+      - "443:443"
+      - "2049:2049"
+      - "9022:9022"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./.volumes/traefik:/config
@@ -44,7 +46,7 @@ services:
       - traefik.http.middlewares.homepage-redirect.redirectregex.regex=.*
       - traefik.http.middlewares.homepage-redirect.redirectregex.replacement=$HOMEPAGE_REDIRECT_URL
       - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
-      # Middlewares
+      # Middleware definitions
       - traefik.http.middlewares.cache-control-private.headers.customresponseheaders.Cache-Control=private
       - traefik.http.middlewares.perso-basic-auth.basicauth.users=$PERSO_BASIC_AUTH
       - traefik.http.middlewares.japan7-basic-auth.basicauth.users=$JAPAN7_BASIC_AUTH
