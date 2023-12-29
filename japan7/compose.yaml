@@ -37,7 +37,7 @@ services:
     build: rclone-nfs
     environment:
       - RCLONE_REMOTE=$RCLONE_NFS_REMOTE
-      - RCLONE_OPTS=--transfers 50 --checkers 100 --vfs-cache-max-age 5m --vfs-write-back 1m
+      - RCLONE_OPTS=--transfers 50 --checkers 100 --vfs-cache-max-age 15m --vfs-write-back 5m
       - NFS_DISABLE_VERSION_3=1
       - NFS_LOG_LEVEL=DEBUG
     volumes:
