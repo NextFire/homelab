@@ -1,7 +1,6 @@
 include:
   - keycloak.compose.yaml
   - mastodon.compose.yaml
-  - matrix.compose.yaml
   - outline.compose.yaml
   - owntracks.compose.yaml
 
