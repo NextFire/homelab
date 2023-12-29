@@ -11,7 +11,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.owntracks-recorder.entrypoints=websecure
       - traefik.http.routers.owntracks-recorder.rule=Host(`owntracks.$DOMAIN`) && Path(`/pub`)
-      - traefik.http.routers.owntracks-recorder.middlewares=perso-basic-auth@docker
+      - traefik.http.routers.owntracks-recorder.middlewares=private-basic-auth@docker
       - traefik.http.services.owntracks-recorder-docker.loadbalancer.server.port=8083
 
   owntracks-frontend:

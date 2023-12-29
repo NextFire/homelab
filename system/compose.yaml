@@ -48,7 +48,7 @@ services:
       - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
       # Middleware definitions
       - traefik.http.middlewares.cache-control-private.headers.customresponseheaders.Cache-Control=private
-      - traefik.http.middlewares.perso-basic-auth.basicauth.users=$PERSO_BASIC_AUTH
+      - traefik.http.middlewares.private-basic-auth.basicauth.users=$PRIVATE_BASIC_AUTH
       - traefik.http.middlewares.japan7-basic-auth.basicauth.users=$JAPAN7_BASIC_AUTH
       - traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181
       - traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User
