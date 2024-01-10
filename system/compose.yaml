@@ -4,7 +4,7 @@ services:
     environment:
       - CLOUDFLARE_DNS_API_TOKEN=$CLOUDFLARE_DNS_API_TOKEN
     command:
-      - --log.level=DEBUG
+      - --log.level=INFO
       - --accesslog=true
       - --api.dashboard=true
       - --providers.docker=true
