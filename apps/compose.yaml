@@ -5,7 +5,7 @@ include:
 
 services:
   forgejo:
-    image: codeberg.org/forgejo/forgejo:1.20
+    image: codeberg.org/forgejo/forgejo:1.21
     volumes:
       - ./.volumes/forgejo:/data
     restart: unless-stopped
