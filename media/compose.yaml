@@ -66,18 +66,6 @@ services:
       - traefik.http.routers.flexget.entrypoints=websecure
       - traefik.http.services.flexget-docker.loadbalancer.server.port=5050
 
-  filebot:
-    image: jlesage/filebot:latest
-    volumes:
-      - ./.volumes/filebot:/config
-      - $RCLONE_HOST_MOUNT:/storage:slave
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.filebot.entrypoints=websecure
-      - traefik.http.routers.filebot.middlewares=traefik-forward-auth@docker
-      - traefik.http.services.filebot-docker.loadbalancer.server.port=5800
-
   mkvtoolnix:
     image: jlesage/mkvtoolnix:latest
     volumes:

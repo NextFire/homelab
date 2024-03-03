@@ -18,7 +18,6 @@ services:
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
       - --entrypoints.websecure.http3=true
       - --entrypoints.rclone-nfs.address=:2049
-      - --entrypoints.forgejo-ssh.address=:9022
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.letsencrypt.acme.email=$ACME_EMAIL
       - --certificatesresolvers.letsencrypt.acme.storage=/config/acme.json
@@ -27,7 +26,6 @@ services:
       - "443:443/tcp"
       - "443:443/udp"
       - "2049:2049/tcp"
-      - "9022:9022/tcp"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./.volumes/traefik:/config
@@ -65,17 +63,6 @@ services:
       - CLIENT_SECRET=$TFA_CLIENT_SECRET
       - SCOPE=openid profile email
     restart: unless-stopped
-
-  portainer:
-    image: portainer/portainer-ce:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./.volumes/portainer:/data
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.portainer.entrypoints=websecure
-      - traefik.http.services.portainer-docker.loadbalancer.server.port=9000
 
   watchtower:
     image: containrrr/watchtower:latest
