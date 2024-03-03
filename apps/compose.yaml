@@ -2,3 +2,15 @@ include:
   - keycloak.compose.yaml
   - outline.compose.yaml
   - owntracks.compose.yaml
+
+services:
+  kara:
+    image: svenstaro/miniserve:alpine
+    command: /html
+    volumes:
+      - ./.volumes/kara:/html:ro
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kara.entrypoints=websecure
+      - traefik.http.services.kara-docker.loadbalancer.server.port=8080
