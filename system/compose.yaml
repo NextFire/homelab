@@ -36,7 +36,7 @@ services:
       # Dashboard router
       - traefik.enable=true
       - traefik.http.routers.traefik.entrypoints=websecure
-      - traefik.http.routers.traefik.middlewares=traefik-forward-auth@docker
+      - traefik.http.routers.traefik.middlewares=authelia@docker
       - traefik.http.routers.traefik.service=api@internal
       # Root router
       - traefik.http.routers.root.entrypoints=websecure
@@ -48,21 +48,29 @@ services:
       - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
       # Middleware definitions
       - traefik.http.middlewares.cache-control-private.headers.customresponseheaders.Cache-Control=private
-      - traefik.http.middlewares.private-basic-auth.basicauth.users=$PRIVATE_BASIC_AUTH
-      - traefik.http.middlewares.japan7-basic-auth.basicauth.users=$JAPAN7_BASIC_AUTH
-      - traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181
-      - traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User
+      - traefik.http.middlewares.japan7-basic.basicauth.users=$JAPAN7_BASIC_AUTH
 
-  traefik-forward-auth:
-    image: ghcr.io/japan7/traefik-forward-auth:master
+  authelia:
+    image: authelia/authelia:latest
     environment:
-      - SECRET=$TFA_SECRET
-      - ENCRYPTION_KEY=$TFA_ENCRYPTION_KEY
-      - PROVIDER_URI=https://keycloak.$DOMAIN/realms/$TFA_REALM
-      - CLIENT_ID=$TFA_CLIENT_ID
-      - CLIENT_SECRET=$TFA_CLIENT_SECRET
-      - SCOPE=openid profile email
+      - AUTHELIA_NOTIFIER_SMTP_HOST=$SMTP_HOST
+      - AUTHELIA_NOTIFIER_SMTP_PORT=$SMTP_PORT
+      - AUTHELIA_NOTIFIER_SMTP_USERNAME=$SMTP_USERNAME
+      - AUTHELIA_NOTIFIER_SMTP_PASSWORD=$SMTP_PASSWORD
+      - AUTHELIA_NOTIFIER_SMTP_SENDER=Authelia <authelia@$DOMAIN>
+    volumes:
+      - ./.volumes/authelia:/config
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.authelia.entrypoints=websecure
+      - traefik.http.services.authelia-docker.loadbalancer.server.port=9091
+      - traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https%3A%2F%2Fauthelia.${DOMAIN}%2F
+      - traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true
+      - traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email
+      - traefik.http.middlewares.authelia-basic.forwardAuth.address=http://authelia:9091/api/verify?auth=basic
+      - traefik.http.middlewares.authelia-basic.forwardAuth.trustForwardHeader=true
+      - traefik.http.middlewares.authelia-basic.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email
 
   watchtower:
     image: containrrr/watchtower:latest
@@ -87,5 +95,5 @@ services:
       - ./borg/etc:/etc/borgmatic.d/:ro # borgmatic config file(s) + crontab.txt
       - ./.volumes/borg/config:/root/.config/borg # config and keyfiles
       - ./.volumes/borg/cache:/root/.cache/borg # checksums used for deduplication
-      - ../.shared/rclone:/root/.config/rclone
+      - ../shared/rclone:/root/.config/rclone
     restart: unless-stopped

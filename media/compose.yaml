@@ -1,9 +1,9 @@
 services:
   rclone:
-    image: rclone/rclone:1.62
+    image: rclone/rclone:1.65
     command: mount $RCLONE_REMOTE /remote --vfs-cache-mode full --cache-dir /cache --transfers 50 --checkers 100 --allow-other --allow-non-empty --verbose
     volumes:
-      - ../.shared/rclone:/config/rclone
+      - ../shared/rclone:/config/rclone
       - rclone-cache:/cache
       - $RCLONE_HOST_MOUNT:/remote:shared
     devices:
@@ -39,7 +39,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.tautulli.entrypoints=websecure
-      - traefik.http.routers.tautulli.middlewares=traefik-forward-auth@docker
+      - traefik.http.routers.tautulli.middlewares=authelia@docker
       - traefik.http.services.tautulli-docker.loadbalancer.server.port=8181
 
   qbittorrent:
@@ -52,7 +52,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.qbittorrent.entrypoints=websecure
-      - traefik.http.routers.qbittorrent.middlewares=traefik-forward-auth@docker
+      - traefik.http.routers.qbittorrent.middlewares=authelia@docker
       - traefik.http.services.qbittorrent-docker.loadbalancer.server.port=8080
 
   flexget:
@@ -75,7 +75,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.mkvtoolnix.entrypoints=websecure
-      - traefik.http.routers.mkvtoolnix.middlewares=traefik-forward-auth@docker
+      - traefik.http.routers.mkvtoolnix.middlewares=authelia@docker
       - traefik.http.services.mkvtoolnix-docker.loadbalancer.server.port=5800
 
 volumes:
