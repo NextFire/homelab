@@ -1,0 +1,115 @@
+---
+- name: Configure system
+  hosts: all
+  tasks:
+    - name: Set apk repositories
+      ansible.builtin.copy:
+        src: files/apk/repositories
+        dest: /etc/apk/repositories
+        mode: "0644"
+
+    - name: Install packages
+      ansible.builtin.package:
+        name:
+          - curl
+          - docker
+          - docker-compose
+          - fish
+          - ffmpeg
+          - fuse
+          - git
+          - htop
+          - jq
+          - logrotate
+          - ranger
+          - vim
+          - wireguard-tools
+
+    - name: Add mount propagation fix
+      ansible.builtin.copy:
+        src: files/local.d/mount-propagation.start
+        dest: /etc/local.d/mount-propagation.start
+        mode: "0755"
+
+    - name: Add nanak8s updater
+      ansible.builtin.copy:
+        content: "{{ lookup('community.sops.sops', 'files/periodic/nanak8s.sops.sh') }}"
+        dest: /etc/periodic/15min/nanak8s
+        mode: "0700"
+
+    - name: Enable modules
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: present
+        persistent: present
+      loop:
+        - fuse
+
+    - name: Enable services
+      ansible.builtin.service:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop:
+        - crond
+        - docker
+        - local
+
+    - name: Disable boot services
+      ansible.builtin.service:
+        name: "{{ item }}"
+        enabled: false
+        state: stopped
+        runlevel: boot
+      loop:
+        - swap
+
+- name: Configure root user
+  hosts: all
+  tasks:
+    - name: Set default shell
+      ansible.builtin.lineinfile:
+        path: /etc/passwd
+        regexp: "^root:"
+        line: root:x:0:0:root:/root:/usr/bin/fish
+
+    - name: Create jotta symlink
+      ansible.builtin.file:
+        src: /mnt/jotta
+        dest: /root/jotta
+        state: link
+        force: true
+
+    - name: Add .gitconfig
+      ansible.builtin.copy:
+        src: files/git/.gitconfig
+        dest: /root/.gitconfig
+        mode: "0600"
+
+    - name: Create .config directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0700"
+      loop:
+        - /root/.config/fish
+        - /root/.config/htop
+        - /root/.config/sachi
+
+    - name: Add config.fish
+      ansible.builtin.copy:
+        src: files/fish/config.fish
+        dest: /root/.config/fish/config.fish
+        mode: "0600"
+
+    - name: Add htoprc
+      ansible.builtin.get_url:
+        url: https://git.odrling.xyz/odrling/dotfiles/raw/branch/master/.config/htop/htoprc
+        dest: /root/.config/htop/htoprc
+        mode: "0600"
+
+    - name: Add sachi config
+      ansible.builtin.copy:
+        content: "{{ (lookup('community.sops.sops', 'files/sachi/config.sops.yaml') | from_yaml).config }}"
+        dest: /root/.config/sachi/config.toml
+        mode: "0600"

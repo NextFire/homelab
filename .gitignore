@@ -1,5 +1,4 @@
 *.env
 .volumes/
 
-/nanak8s-dns.sh
 /shared/rclone/rclone.conf
