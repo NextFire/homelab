@@ -9,7 +9,7 @@ services:
       - --api.dashboard=true
       - --providers.docker=true
       - --providers.docker.exposedByDefault=false
-      - --providers.docker.defaultRule=Host(`{{ .Name | trimSuffix "-docker" | normalize }}.$DOMAIN`)
+      - --providers.docker.defaultRule=Host(`{{ .Name | trimSuffix "-homelab" | normalize }}.$DOMAIN`)
       - --providers.file.directory=/config
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
