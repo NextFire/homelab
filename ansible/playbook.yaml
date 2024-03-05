@@ -44,6 +44,8 @@
         persistent: present
       loop:
         - fuse
+        - nfs
+        - nfsd
 
     - name: Enable services
       ansible.builtin.service:
