@@ -11,9 +11,11 @@
     - name: Install packages
       ansible.builtin.package:
         name:
+          - coredns
           - curl
           - docker
           - docker-compose
+          - drill
           - fish
           - ffmpeg
           - fuse
@@ -21,13 +23,20 @@
           - htop
           - jq
           - logrotate
+          - make
           - ranger
           - vim
           - wireguard-tools
 
+    - name: Add Corefile
+      ansible.builtin.copy:
+        src: files/coredns/Corefile
+        dest: /etc/coredns/Corefile
+        mode: "0644"
+
     - name: Add mount propagation fix
       ansible.builtin.copy:
-        src: files/local.d/mount-propagation.start
+        content: mount --make-shared /
         dest: /etc/local.d/mount-propagation.start
         mode: "0755"
 
@@ -53,6 +62,7 @@
         enabled: true
         state: started
       loop:
+        - coredns
         - crond
         - docker
         - local
@@ -65,6 +75,14 @@
         runlevel: boot
       loop:
         - swap
+
+    - name: Set DNS
+      ansible.builtin.copy:
+        content: |
+          nameserver 127.0.0.1
+          nameserver ::1
+        dest: /etc/resolv.conf
+        mode: "0644"
 
 - name: Configure root user
   hosts: all
