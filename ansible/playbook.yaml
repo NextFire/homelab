@@ -1,0 +1,46 @@
+---
+# https://www.flatcar.org/docs/latest/installing/bare-metal/installing-to-disk
+- name: Install Flatcar
+  hosts: all
+  tasks:
+    - name: Setup DNS
+      ansible.builtin.lineinfile:
+        path: /etc/resolv.conf
+        line: nameserver 1.1.1.1
+
+    - name: Install dependencies
+      ansible.builtin.package:
+        state: present
+        name:
+          - bash
+          - lbzip2
+          - util-linux
+          - wget
+          - grep
+          - coreutils
+          - udev
+          - gnupg2
+          - gawk
+
+    - name: Fetch install script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/flatcar/init/flatcar-master/bin/flatcar-install
+        dest: /tmp/flatcar-install
+        mode: "0755"
+
+    - name: Copy ignition file
+      ansible.builtin.copy:
+        src: ignition.json
+        dest: /tmp/ignition.json
+        mode: "0644"
+
+    - name: Run flatcar-install
+      ansible.builtin.command:
+        cmd: ./flatcar-install -s -C stable -i ignition.json -u
+        chdir: /tmp
+      register: install_output
+      changed_when: install_output.rc != 0
+
+    - name: Show install_output
+      ansible.builtin.debug:
+        var: install_output.stdout
