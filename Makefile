@@ -1,5 +1,5 @@
 ansible:
-	cd ansible/ && ansible-playbook -i $(host), playbook.yaml
+	cd ansible/ && ansible-playbook --diff -i hosts.yaml playbook.yaml
 
 compose:
 	docker compose up -d --remove-orphans

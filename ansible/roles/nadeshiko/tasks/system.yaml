@@ -1,0 +1,9 @@
+---
+- name: Disable boot services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: false
+    state: stopped
+    runlevel: boot
+  loop:
+    - swap

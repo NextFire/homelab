@@ -1,0 +1,31 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    command:
+      - --log.level=INFO
+      - --accesslog=true
+      - --providers.docker=true
+      - --providers.file.directory=/config
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http3=true
+    ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
+      - "443:443/udp"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik:/config
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    command:
+      - --cleanup
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped

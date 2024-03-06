@@ -1,0 +1,54 @@
+---
+- name: Set apk repositories
+  ansible.builtin.copy:
+    src: apk/repositories
+    dest: /etc/apk/repositories
+    mode: preserve
+
+- name: Install packages
+  ansible.builtin.package:
+    name:
+      - coredns
+      - docker
+      - docker-compose
+      - fuse
+      - logrotate
+
+- name: Add mount propagation fix
+  ansible.builtin.copy:
+    content: mount --make-shared /
+    dest: /etc/local.d/mount-propagation.start
+    mode: "0755"
+
+- name: Add Corefile
+  ansible.builtin.copy:
+    src: coredns/Corefile
+    dest: /etc/coredns/Corefile
+    mode: preserve
+
+- name: Enable modules
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+    persistent: present
+  loop:
+    - fuse
+
+- name: Enable services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - coredns
+    - crond
+    - docker
+    - local
+
+- name: Set DNS
+  ansible.builtin.copy:
+    content: |
+      nameserver 127.0.0.1
+      nameserver ::1
+    dest: /etc/resolv.conf
+    mode: "0644"

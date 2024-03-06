@@ -1,0 +1,31 @@
+---
+- name: Install packages
+  become: true
+  ansible.builtin.package:
+    name:
+      - drill
+      - fish
+      - htop
+      - ranger
+      - shadow
+      - vim
+      - wireguard-tools
+
+- name: Set default shell
+  ansible.builtin.shell:
+    cmd: chsh $USER -s /usr/bin/fish
+  changed_when: true
+
+- name: Create .config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0700"
+  loop:
+    - ~/.config/htop
+
+- name: Add htoprc
+  ansible.builtin.get_url:
+    url: https://git.odrling.xyz/odrling/dotfiles/raw/branch/master/.config/htop/htoprc
+    dest: ~/.config/htop/htoprc
+    mode: "0600"

@@ -1,0 +1,60 @@
+---
+- name: Install packages
+  become: true
+  ansible.builtin.package:
+    name:
+      - ffmpeg
+      - git
+      - make
+
+- name: Add .ssh authorized_keys
+  ansible.builtin.copy:
+    src: ssh/authorized_keys
+    dest: ~/.ssh/authorized_keys
+    mode: preserve
+
+- name: Add .ssh pubkey
+  ansible.builtin.copy:
+    src: ssh/id_ed25519.pub
+    dest: ~/.ssh/id_ed25519.pub
+    mode: preserve
+
+- name: Add .ssh privkey
+  ansible.builtin.copy:
+    content: "{{ lookup('community.sops.sops', 'ssh/id_ed25519.sops.key') }}\n"
+    dest: ~/.ssh/id_ed25519
+    mode: preserve
+
+- name: Add .gitconfig
+  ansible.builtin.copy:
+    src: git/.gitconfig
+    dest: ~/.gitconfig
+    mode: preserve
+
+- name: Create jotta symlink
+  ansible.builtin.file:
+    src: /mnt/jotta
+    dest: ~/jotta
+    state: link
+    force: true
+
+- name: Create .config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0700"
+  loop:
+    - ~/.config/fish
+    - ~/.config/sachi
+
+- name: Add config.fish
+  ansible.builtin.copy:
+    src: fish/config.fish
+    dest: ~/.config/fish/config.fish
+    mode: preserve
+
+- name: Add sachi config
+  ansible.builtin.copy:
+    content: "{{ (lookup('community.sops.sops', 'sachi/config.sops.yaml') | from_yaml).config }}"
+    dest: ~/.config/sachi/config.toml
+    mode: preserve

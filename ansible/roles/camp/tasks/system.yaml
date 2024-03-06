@@ -1,0 +1,30 @@
+---
+- name: Install packages
+  ansible.builtin.package:
+    name:
+      - curl
+      - jq
+
+- name: Enable modules
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+    persistent: present
+  loop:
+    - nfs
+    - nfsd
+
+- name: Disable boot services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: false
+    state: stopped
+    runlevel: boot
+  loop:
+    - swap
+
+- name: Add nanak8s updater
+  ansible.builtin.copy:
+    content: "{{ lookup('community.sops.sops', 'periodic/nanak8s.sops.sh') }}"
+    dest: /etc/periodic/15min/nanak8s
+    mode: "0755"
