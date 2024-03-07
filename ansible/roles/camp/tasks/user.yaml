@@ -7,17 +7,14 @@
       - git
       - make
 
-- name: Add .ssh authorized_keys
+- name: Add .ssh files
   ansible.builtin.copy:
-    src: ssh/authorized_keys
-    dest: ~/.ssh/authorized_keys
+    src: ssh/{{ item }}
+    dest: ~/.ssh/{{ item }}
     mode: preserve
-
-- name: Add .ssh pubkey
-  ansible.builtin.copy:
-    src: ssh/id_ed25519.pub
-    dest: ~/.ssh/id_ed25519.pub
-    mode: preserve
+  loop:
+    - id_ed25519.pub
+    - authorized_keys
 
 - name: Add .ssh privkey
   ansible.builtin.copy:
@@ -59,6 +56,7 @@
     url: https://github.com/NextFire/dotfiles/raw/macos/.config/git/allowed_signers
     dest: ~/.config/git/allowed_signers
     mode: "0644"
+    force: true
 
 - name: Add sachi config
   ansible.builtin.copy:

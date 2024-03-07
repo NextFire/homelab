@@ -12,9 +12,9 @@
       - wireguard-tools
 
 - name: Set default shell
-  ansible.builtin.shell:
-    cmd: chsh $USER -s /usr/bin/fish
-  changed_when: true
+  ansible.builtin.user:
+    name: "{{ ansible_env.USER }}"
+    shell: /usr/bin/fish
 
 - name: Create .config directories
   ansible.builtin.file:
