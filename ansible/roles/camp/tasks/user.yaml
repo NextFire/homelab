@@ -45,6 +45,7 @@
     mode: "0700"
   loop:
     - ~/.config/fish
+    - ~/.config/git
     - ~/.config/sachi
 
 - name: Add config.fish
@@ -52,6 +53,12 @@
     src: fish/config.fish
     dest: ~/.config/fish/config.fish
     mode: preserve
+
+- name: Add git allowed_signers
+  ansible.builtin.get_url:
+    url: https://github.com/NextFire/dotfiles/raw/macos/.config/git/allowed_signers
+    dest: ~/.config/git/allowed_signers
+    mode: "0644"
 
 - name: Add sachi config
   ansible.builtin.copy:
