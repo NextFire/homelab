@@ -45,7 +45,12 @@
     - docker
     - local
 
-- name: Set DNS
+- name: Disable resolv.conf DHCP overwrite
+  ansible.builtin.lineinfile:
+    path: /etc/udhcpc/udhcpc.conf
+    line: RESOLV_CONF="no"
+
+- name: Update resolv.conf
   ansible.builtin.copy:
     content: |
       nameserver 127.0.0.1
