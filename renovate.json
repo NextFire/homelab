@@ -11,6 +11,10 @@
   "ignoreTests": true,
   "packageRules": [
     {
+      "matchPackagePatterns": ["^lscr.io/linuxserver/"],
+      "versioning": "regex:^(?<compatibility>.*)-v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>.+)?$"
+    },
+    {
       "matchFileNames": ["media/compose.yaml"],
       "matchPackageNames": ["rclone/rclone"],
       "enabled": false
