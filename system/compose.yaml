@@ -73,6 +73,17 @@ services:
       - traefik.http.middlewares.authelia-basic.forwardAuth.trustForwardHeader=true
       - traefik.http.middlewares.authelia-basic.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email
 
+  portainer:
+    image: portainer/portainer-ce:2.19.4-alpine
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./.volumes/portainer:/data
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.entrypoints=websecure
+      - traefik.http.services.portainer-docker.loadbalancer.server.port=9000
+
   borg:
     image: b3vis/borgmatic:1.8.9
     hostname: borg
