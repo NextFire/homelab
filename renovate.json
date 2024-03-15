@@ -1,0 +1,26 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":prConcurrentLimitNone",
+    ":prHourlyLimitNone",
+    ":automergePatch",
+    ":automergeBranch"
+  ],
+  "configMigration": true,
+  "ignoreTests": true,
+  "docker-compose": {
+    "fileMatch": [".*\\.compose\\.yaml$"]
+  },
+  "packageRules": [
+    {
+      "matchPackagePrefixes": ["lscr.io/linuxserver/"],
+      "allowedVersions": "<10"
+    },
+    {
+      "matchFileNames": ["media/compose.yaml"],
+      "matchPackageNames": ["rclone/rclone"],
+      "enabled": false
+    }
+  ]
+}
