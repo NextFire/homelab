@@ -4,6 +4,7 @@
     name:
       - curl
       - jq
+      - procps
 
 - name: Enable modules
   community.general.modprobe:
@@ -22,6 +23,13 @@
     runlevel: boot
   loop:
     - swap
+
+- name: Enable sshd tcp forwarding
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?AllowTcpForwarding"
+    line: "AllowTcpForwarding yes"
+  notify: Restart sshd service
 
 - name: Add nanak8s updater
   ansible.builtin.copy:
