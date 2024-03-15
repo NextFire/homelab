@@ -17,7 +17,7 @@ services:
       - com.centurylinklabs.watchtower.monitor-only=true
 
   plex:
-    image: lscr.io/linuxserver/plex:1.40.1
+    image: lscr.io/linuxserver/plex:version-1.40.1.8227-c0dd5a73e
     environment:
       - VERSION=docker
       - DOCKER_MODS=linuxserver/mods:plex-absolute-hama
@@ -32,7 +32,7 @@ services:
       - traefik.http.services.plex-docker.loadbalancer.server.port=32400
 
   tautulli:
-    image: lscr.io/linuxserver/tautulli:2.13.4
+    image: lscr.io/linuxserver/tautulli:version-v2.13.4
     volumes:
       - ./.volumes/tautulli:/config
     restart: unless-stopped
@@ -43,7 +43,7 @@ services:
       - traefik.http.services.tautulli-docker.loadbalancer.server.port=8181
 
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:4.6.3
+    image: lscr.io/linuxserver/qbittorrent:version-4.6.3-r0
     volumes:
       - ./.volumes/qbittorrent:/config
       - ./qbittorrent/scripts:/config/scripts:ro
