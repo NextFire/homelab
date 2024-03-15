@@ -5,55 +5,48 @@
     dest: /etc/apk/repositories
     mode: preserve
 
-- name: Install packages
+- name: Install Docker
   ansible.builtin.package:
     name:
-      - coredns
       - docker
       - docker-compose
-      - fuse
-      - logrotate
+  notify: Enable docker service
+
+- name: Install CoreDNS
+  ansible.builtin.package:
+    name: coredns
+  notify:
+    - Enable coredns service
+    - Disable resolv.conf DHCP overwrite
+    - Update resolv.conf
+
+- name: Configure CoreDNS
+  ansible.builtin.copy:
+    src: coredns/Corefile
+    dest: /etc/coredns/Corefile
+    mode: preserve
+  notify: Restart coredns service
+
+- name: Install FUSE
+  ansible.builtin.package:
+    name: fuse
+  notify: Enable fuse module
+
+- name: Install logrotate
+  ansible.builtin.package:
+    name: logrotate
+  notify: Enable crond service
+
+- name: Disable sshd password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication no"
+  notify: Restart sshd service
 
 - name: Add mount propagation fix
   ansible.builtin.copy:
     content: mount --make-shared /
     dest: /etc/local.d/mount-propagation.start
     mode: "0755"
-
-- name: Add Corefile
-  ansible.builtin.copy:
-    src: coredns/Corefile
-    dest: /etc/coredns/Corefile
-    mode: preserve
-
-- name: Enable modules
-  community.general.modprobe:
-    name: "{{ item }}"
-    state: present
-    persistent: present
-  loop:
-    - fuse
-
-- name: Enable services
-  ansible.builtin.service:
-    name: "{{ item }}"
-    enabled: true
-    state: started
-  loop:
-    - coredns
-    - crond
-    - docker
-    - local
-
-- name: Disable resolv.conf DHCP overwrite
-  ansible.builtin.lineinfile:
-    path: /etc/udhcpc/udhcpc.conf
-    line: RESOLV_CONF="no"
-
-- name: Update resolv.conf
-  ansible.builtin.copy:
-    content: |
-      nameserver 127.0.0.1
-      nameserver ::1
-    dest: /etc/resolv.conf
-    mode: "0644"
+  notify: Enable local service

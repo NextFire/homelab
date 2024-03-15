@@ -4,11 +4,4 @@
     src: compose
     dest: ~/compose
     mode: preserve
-  register: compose_files
-
-- name: Compose up
-  become: true
-  ansible.builtin.command:
-    cmd: docker compose up -d --remove-orphans
-    chdir: ~/compose
-  changed_when: compose_files.changed
+  notify: Compose up

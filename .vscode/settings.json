@@ -1,6 +1,7 @@
 {
   "explorer.excludeGitIgnore": false,
   "files.associations": {
-    "**/ansible/**/tasks/*.yaml": "ansible"
+    "**/ansible/*.yaml": "ansible",
+    "**/ansible/**/{meta,tasks,handlers}/*.yaml": "ansible"
   }
 }

@@ -28,3 +28,4 @@
     content: "{{ lookup('community.sops.sops', 'periodic/nanak8s.sops.sh') }}"
     dest: /etc/periodic/15min/nanak8s
     mode: "0755"
+  notify: Enable crond service

@@ -1,0 +1,55 @@
+---
+- name: Enable docker service
+  ansible.builtin.service:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Enable coredns service
+  ansible.builtin.service:
+    name: coredns
+    enabled: true
+    state: started
+
+- name: Disable resolv.conf DHCP overwrite
+  ansible.builtin.lineinfile:
+    path: /etc/udhcpc/udhcpc.conf
+    line: RESOLV_CONF="no"
+
+- name: Update resolv.conf
+  ansible.builtin.copy:
+    content: |
+      nameserver 127.0.0.1
+      nameserver ::1
+    dest: /etc/resolv.conf
+    mode: "0644"
+
+- name: Restart coredns service
+  ansible.builtin.service:
+    name: coredns
+    enabled: true
+    state: restarted
+
+- name: Enable fuse module
+  community.general.modprobe:
+    name: fuse
+    state: present
+    persistent: present
+
+- name: Enable crond service
+  ansible.builtin.service:
+    name: crond
+    enabled: true
+    state: started
+
+- name: Restart sshd service
+  ansible.builtin.service:
+    name: sshd
+    enabled: true
+    state: restarted
+
+- name: Enable local service
+  ansible.builtin.service:
+    name: local
+    enabled: true
+    state: started

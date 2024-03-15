@@ -1,15 +1,13 @@
 ---
-- name: Base configuration
+- name: Configure
   hosts: all
-  roles:
-    - common
+  tasks:
+    - name: Camp configuration
+      ansible.builtin.include_role:
+        name: camp
+      when: inventory_hostname == 'camp.yuru.moe'
 
-- name: Camp configuration
-  hosts: camp
-  roles:
-    - camp
-
-- name: Nadeshiko configuration
-  hosts: nadeshiko
-  roles:
-    - nadeshiko
+    - name: Nadeshiko configuration
+      ansible.builtin.include_role:
+        name: nadeshiko
+      when: inventory_hostname == 'nadeshiko.yuru.moe'
