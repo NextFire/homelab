@@ -1,4 +1,4 @@
-FROM heywoodlh/nfs-server:latest
+FROM heywoodlh/nfs-server:2.5.4
 
 RUN apk add --no-cache supervisor fuse3
 

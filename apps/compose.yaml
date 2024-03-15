@@ -4,7 +4,7 @@ include:
 
 services:
   kara:
-    image: svenstaro/miniserve:alpine
+    image: svenstaro/miniserve:0.26.0-alpine
     command: /html
     volumes:
       - ./.volumes/kara:/html:ro

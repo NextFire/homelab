@@ -1,6 +1,6 @@
 services:
   rclone:
-    image: rclone/rclone:1.66
+    image: rclone/rclone:1.66.0
     command: mount $RCLONE_REMOTE /remote --vfs-cache-mode full --cache-dir /cache --transfers 50 --checkers 100 --allow-other --allow-non-empty --verbose
     volumes:
       - ../shared/rclone:/config/rclone
@@ -17,7 +17,7 @@ services:
       - com.centurylinklabs.watchtower.monitor-only=true
 
   plex:
-    image: lscr.io/linuxserver/plex:latest
+    image: lscr.io/linuxserver/plex:1.40.1
     environment:
       - VERSION=docker
       - DOCKER_MODS=linuxserver/mods:plex-absolute-hama
@@ -32,7 +32,7 @@ services:
       - traefik.http.services.plex-docker.loadbalancer.server.port=32400
 
   tautulli:
-    image: lscr.io/linuxserver/tautulli:latest
+    image: lscr.io/linuxserver/tautulli:2.13.4
     volumes:
       - ./.volumes/tautulli:/config
     restart: unless-stopped
@@ -43,7 +43,7 @@ services:
       - traefik.http.services.tautulli-docker.loadbalancer.server.port=8181
 
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
+    image: lscr.io/linuxserver/qbittorrent:4.6.3
     volumes:
       - ./.volumes/qbittorrent:/config
       - ./qbittorrent/scripts:/config/scripts:ro
@@ -56,7 +56,7 @@ services:
       - traefik.http.services.qbittorrent-docker.loadbalancer.server.port=8080
 
   flexget:
-    image: flexget/flexget:latest
+    image: flexget/flexget:3.11.23
     command: daemon start --autoreload-config
     volumes:
       - ./.volumes/flexget:/config
@@ -67,7 +67,7 @@ services:
       - traefik.http.services.flexget-docker.loadbalancer.server.port=5050
 
   mkvtoolnix:
-    image: jlesage/mkvtoolnix:latest
+    image: jlesage/mkvtoolnix:v24.02.1
     volumes:
       - ./.volumes/mkvtoolnix:/config
       - $RCLONE_HOST_MOUNT:/storage:slave

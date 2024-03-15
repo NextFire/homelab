@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:v3.0
+    image: traefik:v3.0.0-beta5
     environment:
       - CLOUDFLARE_DNS_API_TOKEN=$CLOUDFLARE_DNS_API_TOKEN
     command:
@@ -51,7 +51,7 @@ services:
       - traefik.http.middlewares.japan7-basic.basicauth.users=$JAPAN7_BASIC_AUTH
 
   authelia:
-    image: authelia/authelia:latest
+    image: authelia/authelia:4.37.5
     environment:
       - AUTHELIA_NOTIFIER_SMTP_HOST=$SMTP_HOST
       - AUTHELIA_NOTIFIER_SMTP_PORT=$SMTP_PORT
@@ -64,28 +64,17 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.authelia.entrypoints=websecure
+      - traefik.http.routers.authelia.rule=Host(`auth.$DOMAIN`)
       - traefik.http.services.authelia-docker.loadbalancer.server.port=9091
-      - traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https%3A%2F%2Fauthelia.${DOMAIN}%2F
+      - traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https%3A%2F%2Fauth.${DOMAIN}%2F
       - traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true
       - traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email
       - traefik.http.middlewares.authelia-basic.forwardAuth.address=http://authelia:9091/api/verify?auth=basic
       - traefik.http.middlewares.authelia-basic.forwardAuth.trustForwardHeader=true
       - traefik.http.middlewares.authelia-basic.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email
 
-  watchtower:
-    image: containrrr/watchtower:latest
-    command:
-      - --cleanup
-      - --notifications=shoutrrr
-      - --notification-url=$NOTIFICATION_URL
-      - --no-startup-message
-      - "--schedule=0 0 6 * * *"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
-
   borg:
-    image: b3vis/borgmatic:latest
+    image: b3vis/borgmatic:1.8.9
     hostname: borg
     environment:
       - BORG_REPO_REMOTE=$BORG_REPO_REMOTE

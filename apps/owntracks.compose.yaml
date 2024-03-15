@@ -1,6 +1,6 @@
 services:
   owntracks-recorder:
-    image: owntracks/recorder:latest
+    image: owntracks/recorder:0.9.7
     hostname: owntracks-recorder
     environment:
       - OTR_PORT=0
@@ -15,7 +15,7 @@ services:
       - traefik.http.services.owntracks-recorder-docker.loadbalancer.server.port=8083
 
   owntracks-frontend:
-    image: owntracks/frontend:latest
+    image: owntracks/frontend:2.12.0
     environment:
       - SERVER_HOST=owntracks-recorder
       - SERVER_PORT=8083
