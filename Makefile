@@ -6,6 +6,6 @@ compose:
 
 up:
 	docker compose up -d --build --remove-orphans
-	docker image prune -f
+	docker image prune -a -f
 
 .PHONY: config compose up
