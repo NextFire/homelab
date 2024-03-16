@@ -8,4 +8,4 @@ up:
 	docker compose up -d --build --remove-orphans
 	docker image prune -f
 
-.PHONY: ansible compose up
+.PHONY: config compose up
