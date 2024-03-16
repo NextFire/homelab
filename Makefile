@@ -1,7 +1,10 @@
-ansible:
-	cd ansible/ && ansible-playbook --diff -i hosts.cfg playbook.yaml
+config:
+	cd ansible/ && ansible-playbook playbook.yaml --tags config
 
 compose:
+	cd ansible/ && ansible-playbook playbook.yaml --tags compose -v
+
+up:
 	docker compose up -d --build --remove-orphans
 
-.PHONY: ansible compose
+.PHONY: ansible compose up

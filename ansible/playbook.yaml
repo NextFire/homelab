@@ -1,6 +1,7 @@
 ---
 - name: Configure
-  hosts: all
+  hosts: config
+  tags: config
   tasks:
     - name: Camp configuration
       ansible.builtin.include_role:
@@ -11,3 +12,9 @@
       ansible.builtin.include_role:
         name: nadeshiko
       when: inventory_hostname == 'nadeshiko.yuru.moe'
+
+- name: Compose
+  hosts: compose
+  tags: compose
+  roles:
+    - compose

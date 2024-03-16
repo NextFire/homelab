@@ -1,0 +1,8 @@
+---
+- name: Pull repo
+  ansible.builtin.git:
+    repo: git@github.com:NextFire/homelab.git
+    dest: ~/homelab
+    version: main
+    clone: false
+  notify: Compose up

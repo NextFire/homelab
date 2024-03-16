@@ -1,0 +1,12 @@
+---
+- name: Compose up
+  become: true
+  community.general.make:
+    target: up
+    chdir: ~/homelab
+  register: compose_up
+  notify: Debug compose_up
+
+- name: Debug compose_up
+  ansible.builtin.debug:
+    var: compose_up
