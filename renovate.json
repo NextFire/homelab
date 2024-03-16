@@ -1,26 +1,27 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended",
+    "github>NextFire/renovate-config",
     ":prConcurrentLimitNone",
-    ":prHourlyLimitNone",
-    ":automergePatch",
-    ":automergeBranch"
+    ":prHourlyLimitNone"
   ],
-  "configMigration": true,
   "ignoreTests": true,
   "docker-compose": {
     "fileMatch": [".*\\.compose\\.yaml$"]
   },
   "packageRules": [
     {
+      "matchFileNames": ["media/compose.yaml"],
+      "matchPackageNames": ["rclone/rclone"],
+      "enabled": false
+    },
+    {
       "matchPackagePrefixes": ["lscr.io/linuxserver/"],
       "allowedVersions": "<10"
     },
     {
-      "matchFileNames": ["media/compose.yaml"],
-      "matchPackageNames": ["rclone/rclone"],
-      "enabled": false
+      "matchPackageNames": ["authelia/authelia"],
+      "allowedVersions": "<4.38"
     }
   ]
 }
