@@ -2,6 +2,7 @@
 - name: Configure
   hosts: config
   tags: config
+  strategy: free # noqa: run-once[play]
   tasks:
     - name: Camp configuration
       ansible.builtin.include_role:
