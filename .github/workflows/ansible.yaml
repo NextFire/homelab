@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  playbook:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,6 +16,4 @@ jobs:
           playbook: playbook.yaml
           directory: ansible/
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          options: |
-            -u root
-            --tags compose
+          options: --diff -i hosts.cfg -u root --tags compose
