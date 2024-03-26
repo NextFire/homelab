@@ -56,7 +56,7 @@ services:
       - traefik.http.services.qbittorrent-docker.loadbalancer.server.port=8080
 
   flexget:
-    image: flexget/flexget:3.11.26
+    image: flexget/flexget:3.11.27
     command: daemon start --autoreload-config
     volumes:
       - ./.volumes/flexget:/config
