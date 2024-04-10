@@ -24,7 +24,7 @@ services:
       - traefik.http.services.projo-docker.loadbalancer.server.port=8080
 
   projo-dl:
-    image: python:3.12.2-alpine
+    image: python:3.12.3-alpine
     hostname: $PROJO_HOSTNAME
     entrypoint: crond -f
     volumes:
