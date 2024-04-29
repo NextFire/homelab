@@ -1,5 +1,4 @@
 include:
-  - outline.compose.yaml
   - owntracks.compose.yaml
 
 services:
