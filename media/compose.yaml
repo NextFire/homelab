@@ -17,7 +17,7 @@ services:
       - com.centurylinklabs.watchtower.monitor-only=true
 
   plex:
-    image: lscr.io/linuxserver/plex:1.40.2
+    image: lscr.io/linuxserver/plex:1.40.3
     environment:
       - VERSION=docker
       - DOCKER_MODS=linuxserver/mods:plex-absolute-hama
