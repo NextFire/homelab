@@ -4,7 +4,6 @@
     name:
       - curl
       - jq
-      - procps
 
 - name: Enable modules
   community.general.modprobe:
@@ -14,15 +13,6 @@
   loop:
     - nfs
     - nfsd
-
-- name: Disable boot services
-  ansible.builtin.service:
-    name: "{{ item }}"
-    enabled: false
-    state: stopped
-    runlevel: boot
-  loop:
-    - swap
 
 - name: Enable sshd tcp forwarding
   ansible.builtin.lineinfile:
