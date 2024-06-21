@@ -57,7 +57,7 @@ services:
 
   flexget:
     image: flexget/flexget:3.11.39
-    command: daemon start --autoreload-config
+    entrypoint: sh -xc 'rm -f /config/.config-lock && flexget daemon start --autoreload-config'
     volumes:
       - ./.volumes/flexget:/config
     restart: unless-stopped
