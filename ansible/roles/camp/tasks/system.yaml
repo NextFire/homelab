@@ -4,6 +4,7 @@
     name:
       - curl
       - jq
+      - yq
 
 - name: Enable modules
   community.general.modprobe:
@@ -27,3 +28,9 @@
     dest: /etc/periodic/15min/nanak8s
     mode: "0755"
   notify: Enable crond service
+
+- name: Add garage updater
+  ansible.builtin.copy:
+    src: periodic/garage.sh
+    dest: /etc/periodic/15min/garage
+    mode: preserve
