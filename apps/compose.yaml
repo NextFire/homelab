@@ -13,3 +13,25 @@ services:
       - traefik.http.routers.kara.entrypoints=websecure
       - traefik.http.routers.kara.middlewares=cache-control-private@docker
       - traefik.http.services.kara-docker.loadbalancer.server.port=8080
+
+  minio:
+    image: bitnami/minio:latest
+    environment:
+      - MINIO_ROOT_USER=$MINIO_ROOT_USER
+      - MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD
+      - MINIO_SERVER_URL=https://minio.$DOMAIN
+      - MINIO_BROWSER_REDIRECT_URL=https://minio.$DOMAIN/console/
+    volumes:
+      - ./.volumes/minio:/bitnami/minio/data
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minio.entrypoints=websecure
+      - traefik.http.routers.minio.service=minio-docker
+      - traefik.http.services.minio-docker.loadbalancer.server.port=9000
+      - traefik.http.routers.minio-ui.entrypoints=websecure
+      - traefik.http.routers.minio-ui.rule=Host(`minio.$DOMAIN`) && PathPrefix(`/console/`)
+      - traefik.http.routers.minio-ui.middlewares=minio-stripprefix@docker
+      - traefik.http.routers.minio-ui.service=minio-ui-docker
+      - traefik.http.services.minio-ui-docker.loadbalancer.server.port=9001
+      - traefik.http.middlewares.minio-stripprefix.stripprefix.prefixes=/console/
