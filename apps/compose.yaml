@@ -35,3 +35,22 @@ services:
       - traefik.http.routers.minio-ui.service=minio-ui-docker
       - traefik.http.services.minio-ui-docker.loadbalancer.server.port=9001
       - traefik.http.middlewares.minio-stripprefix.stripprefix.prefixes=/console/
+
+  registry:
+    image: registry:2.8.3
+    environment:
+      - REGISTRY_AUTH=htpasswd
+      - REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
+      - REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm
+    volumes:
+      - ./.volumes/registry/auth:/auth
+      - registry-data:/var/lib/registry
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.registry.entrypoints=websecure
+      - traefik.http.routers.registry.service=registry-docker
+      - traefik.http.services.registry-docker.loadbalancer.server.port=5000
+
+volumes:
+  registry-data:
