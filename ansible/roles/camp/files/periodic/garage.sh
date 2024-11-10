@@ -15,7 +15,7 @@ git clone git@github.com:Japan7/nanak8s.git $REPO
 git -C $REPO fetch
 git -C $REPO reset --hard origin/main
 
-yq -i "(.environments.default.values[] | select(has(\"garage\"))).garage.addresses = [$VALID_PEERS]" $REPO/apps/garage/environments.yaml
+yq -i ".garage.addresses = [$VALID_PEERS]" $REPO/apps/garage/addresses.yaml
 git -C $REPO add apps/garage/environments.yaml
 git -C $REPO commit -m "[garage] update addresses" --author 'camp.yuru.moe[bot] <camp@yuru.moe>'
 git -C $REPO push
