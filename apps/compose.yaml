@@ -2,6 +2,22 @@ include:
   - owntracks.compose.yaml
 
 services:
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:9.0.1
+    volumes:
+      - ./.volumes/forgejo:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.forgejo.entrypoints=websecure
+      - traefik.http.routers.forgejo.rule=Host(`git.$DOMAIN`)
+      - traefik.http.services.forgejo-docker.loadbalancer.server.port=3000
+      - traefik.tcp.routers.forgejo-ssh.entrypoints=forgejo-ssh
+      - traefik.tcp.routers.forgejo-ssh.rule=HostSNI(`*`)
+      - traefik.tcp.services.forgejo-ssh-docker.loadbalancer.server.port=22
+
   kara:
     image: svenstaro/miniserve:0.28.0-alpine
     command: /html

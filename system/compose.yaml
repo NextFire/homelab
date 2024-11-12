@@ -17,6 +17,7 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
       - --entrypoints.websecure.http3=true
+      - --entrypoints.forgejo-ssh.address=:2222
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.letsencrypt.acme.email=$ACME_EMAIL
       - --certificatesresolvers.letsencrypt.acme.storage=/config/acme.json
@@ -24,6 +25,7 @@ services:
       - "80:80/tcp"
       - "443:443/tcp"
       - "443:443/udp"
+      - "2222:2222/tcp"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./.volumes/traefik:/config
