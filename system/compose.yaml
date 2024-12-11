@@ -72,7 +72,7 @@ services:
       - traefik.http.middlewares.authelia-basic.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email
 
   borg:
-    image: b3vis/borgmatic:1.9.3
+    image: b3vis/borgmatic:1.9.4
     hostname: borg
     environment:
       - BORG_REPO_REMOTE=$BORG_REPO_REMOTE
