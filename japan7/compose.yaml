@@ -12,7 +12,7 @@ services:
       - traefik.http.services.files-docker.loadbalancer.server.port=8080
 
   projo:
-    image: svenstaro/miniserve:0.28.0-alpine
+    image: svenstaro/miniserve:0.29.0-alpine
     command: /html
     volumes:
       - $PROJO_HOST_MOUNT:/html:ro
