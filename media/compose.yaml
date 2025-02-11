@@ -43,7 +43,7 @@ services:
       - traefik.http.services.tautulli-docker.loadbalancer.server.port=8181
 
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:4.6.7
+    image: lscr.io/linuxserver/qbittorrent:5.0.3
     volumes:
       - ./.volumes/qbittorrent:/config
       - ./qbittorrent/scripts:/config/scripts:ro
