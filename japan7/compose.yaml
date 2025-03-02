@@ -32,14 +32,14 @@ services:
       - ./projo:/etc/periodic/hourly:ro
     restart: unless-stopped
 
-  aoc:
-    image: denoland/deno:alpine
-    command:
-      - run
-      - -A
-      - /app/main.ts
-    volumes:
-      - ./.volumes/aoc:/app
-    restart: unless-stopped
-    labels:
-      - com.centurylinklabs.watchtower.enable=false
+  # aoc:
+  #   image: denoland/deno:alpine
+  #   command:
+  #     - run
+  #     - -A
+  #     - /app/main.ts
+  #   volumes:
+  #     - ./.volumes/aoc:/app
+  #   restart: unless-stopped
+  #   labels:
+  #     - com.centurylinklabs.watchtower.enable=false
