@@ -16,8 +16,8 @@
       "enabled": false
     },
     {
-      "allowedVersions": "<10",
-      "matchPackageNames": ["lscr.io/linuxserver/{/,}**"]
+      "matchPackageNames": ["lscr.io/linuxserver/{/,}**"],
+      "allowedVersions": "<10"
     },
     {
       "matchPackageNames": ["authelia/authelia"],
