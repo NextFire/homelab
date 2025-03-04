@@ -3,8 +3,8 @@ include:
 
 services:
   kara:
-    image: node:lts-alpine
-    command: npx serve /html
+    image: svenstaro/miniserve:0.29.0-alpine
+    command: /html
     volumes:
       - ./.volumes/kara:/html:ro
     restart: unless-stopped
@@ -12,7 +12,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.kara.entrypoints=websecure
       - traefik.http.routers.kara.middlewares=cache-control-private@docker
-      - traefik.http.services.kara-docker.loadbalancer.server.port=3000
+      - traefik.http.services.kara-docker.loadbalancer.server.port=8080
 
   minio:
     image: bitnami/minio:2025.2.28

@@ -12,8 +12,8 @@ services:
       - traefik.http.services.files-docker.loadbalancer.server.port=8080
 
   projo:
-    image: node:lts-alpine
-    command: npx serve /html
+    image: svenstaro/miniserve:0.29.0-alpine
+    command: /html
     volumes:
       - $PROJO_HOST_MOUNT:/html:ro
     restart: unless-stopped
@@ -21,7 +21,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.projo.entrypoints=websecure
       - traefik.http.routers.projo.middlewares=cache-control-private@docker,japan7-basic@docker
-      - traefik.http.services.projo-docker.loadbalancer.server.port=3000
+      - traefik.http.services.projo-docker.loadbalancer.server.port=8080
 
   projo-dl:
     image: python:3.13.2-alpine
