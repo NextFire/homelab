@@ -2,6 +2,18 @@ include:
   - owntracks.compose.yaml
 
 services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    environment:
+      - WEBHOOK_URL=https://n8n.$DOMAIN
+    volumes:
+      - ./.volumes/n8n:/home/node/.n8n
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.n8n.entrypoints=websecure
+      - traefik.http.services.n8n-docker.loadbalancer.server.port=5678
+
   kara:
     image: svenstaro/miniserve:0.29.0-alpine
     command: /html
