@@ -7,24 +7,36 @@
   ],
   "ignoreTests": true,
   "docker-compose": {
-    "fileMatch": [".*\\.compose\\.yaml$"]
+    "managerFilePatterns": [
+      "/.*\\.compose\\.yaml$/"
+    ]
   },
   "packageRules": [
     {
-      "matchFileNames": ["media/compose.yaml"],
-      "matchPackageNames": ["rclone/rclone"],
+      "matchFileNames": [
+        "media/compose.yaml"
+      ],
+      "matchPackageNames": [
+        "rclone/rclone"
+      ],
       "enabled": false
     },
     {
-      "matchPackageNames": ["lscr.io/linuxserver/{/,}**"],
+      "matchPackageNames": [
+        "lscr.io/linuxserver/{/,}**"
+      ],
       "allowedVersions": "<10"
     },
     {
-      "matchPackageNames": ["authelia/authelia"],
+      "matchPackageNames": [
+        "authelia/authelia"
+      ],
       "allowedVersions": "<4.38"
     },
     {
-      "matchPackageNames": ["flexget/flexget"],
+      "matchPackageNames": [
+        "flexget/flexget"
+      ],
       "allowedVersions": "<3.12.4"
     }
   ]
