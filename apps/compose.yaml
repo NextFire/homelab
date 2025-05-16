@@ -14,6 +14,17 @@ services:
       - traefik.http.routers.n8n.entrypoints=websecure
       - traefik.http.services.n8n-docker.loadbalancer.server.port=5678
 
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.6.9
+    volumes:
+      - ./.volumes/open-webui:/app/backend/data
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.open-webui.entrypoints=websecure
+      - traefik.http.routers.open-webui.rule=Host(`chat.$DOMAIN`)
+      - traefik.http.services.open-webui-docker.loadbalancer.server.port=8080
+
   kara:
     image: svenstaro/miniserve:0.29.0-alpine
     command: /html
