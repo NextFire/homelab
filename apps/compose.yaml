@@ -60,7 +60,7 @@ services:
       - traefik.http.middlewares.minio-stripprefix.stripprefix.prefixes=/console/
 
   registry:
-    image: registry:2.8.3
+    image: registry:3.0.0
     environment:
       - REGISTRY_AUTH=htpasswd
       - REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
