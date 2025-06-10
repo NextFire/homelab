@@ -11,9 +11,8 @@
   },
   "packageRules": [
     {
-      "matchFileNames": ["media/compose.yaml"],
       "matchPackageNames": ["rclone/rclone"],
-      "enabled": false
+      "automerge": false
     },
     {
       "matchPackageNames": ["lscr.io/linuxserver/{/,}**"],
