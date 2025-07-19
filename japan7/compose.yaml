@@ -1,6 +1,6 @@
 services:
   files:
-    image: rclone/rclone:1.70.2
+    image: rclone/rclone:1.70.3
     command: serve http $RCLONE_REMOTE --addr :8080 --template /config/rclone/index.html --verbose
     volumes:
       - ../shared/rclone:/config/rclone
