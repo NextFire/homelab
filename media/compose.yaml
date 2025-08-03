@@ -32,7 +32,7 @@ services:
       - traefik.http.services.plex-docker.loadbalancer.server.port=32400
 
   tautulli:
-    image: lscr.io/linuxserver/tautulli:2.15.2
+    image: lscr.io/linuxserver/tautulli:2.15.3
     volumes:
       - ./.volumes/tautulli:/config
     restart: unless-stopped
