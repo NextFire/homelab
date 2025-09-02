@@ -51,7 +51,7 @@ services:
   authelia:
     image: authelia/authelia:4.37.5
     environment:
-      - AUTHELIA_NOTIFIER_DISABLE_STARTUP_CHECK=true
+      - AUTHELIA_NOTIFIER_FILESYSTEM_FILENAME=/config/notification.txt
     volumes:
       - ./.volumes/authelia:/config
     restart: unless-stopped
