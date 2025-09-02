@@ -51,11 +51,7 @@ services:
   authelia:
     image: authelia/authelia:4.37.5
     environment:
-      - AUTHELIA_NOTIFIER_SMTP_HOST=$SMTP_HOST
-      - AUTHELIA_NOTIFIER_SMTP_PORT=$SMTP_PORT
-      - AUTHELIA_NOTIFIER_SMTP_USERNAME=$SMTP_USERNAME
-      - AUTHELIA_NOTIFIER_SMTP_PASSWORD=$SMTP_PASSWORD
-      - AUTHELIA_NOTIFIER_SMTP_SENDER=Authelia <authelia@$DOMAIN>
+      - AUTHELIA_NOTIFIER_DISABLE_STARTUP_CHECK=true
     volumes:
       - ./.volumes/authelia:/config
     restart: unless-stopped
