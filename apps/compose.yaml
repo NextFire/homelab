@@ -26,7 +26,7 @@ services:
       - traefik.http.services.open-webui-docker.loadbalancer.server.port=8080
 
   kara:
-    image: svenstaro/miniserve:0.31.0-alpine
+    image: svenstaro/miniserve:0.32.0-alpine
     command: /html
     volumes:
       - ./.volumes/kara:/html:ro
