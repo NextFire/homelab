@@ -24,7 +24,7 @@
       "automerge": false
     },
     {
-      "matchPackageNames": ["bitnami/minio"],
+      "matchPackageNames": ["bitnamilegacy/minio"],
       "allowedVersions": "<2025.5.24"
     }
   ]
