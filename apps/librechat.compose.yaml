@@ -42,7 +42,7 @@ services:
     restart: unless-stopped
 
   librechat-meilisearch:
-    image: getmeili/meilisearch:v1.12.3
+    image: getmeili/meilisearch:v1.12.8
     volumes:
       - ./.volumes/librechat-meilisearch:/meili_data
     restart: unless-stopped
