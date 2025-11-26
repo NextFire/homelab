@@ -1,0 +1,57 @@
+services:
+  librechat:
+    depends_on:
+      - librechat-rag-api
+      - librechat-mongodb
+      - librechat-meilisearch
+    image: ghcr.io/danny-avila/librechat:v0.8.1-rc1
+    env_file: ./.librechat.env
+    environment:
+      - HOST=0.0.0.0
+      - RAG_API_URL=http://librechat-rag-api:8000
+      - MONGO_URI=mongodb://librechat-mongodb
+      - MEILI_HOST=http://librechat-meilisearch:7700
+    volumes:
+      - ./.volumes/librechat/librechat.yaml:/app/librechat.yaml
+      - ./.volumes/librechat/images:/app/client/public/images
+      - ./.volumes/librechat/uploads:/app/uploads
+      - ./.volumes/librechat/logs:/app/logs
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.librechat.entrypoints=websecure
+      - traefik.http.routers.librechat.rule=Host(`chat.$DOMAIN`)
+      - traefik.http.services.librechat-docker.loadbalancer.server.port=3080
+
+  librechat-rag-api:
+    depends_on:
+      - librechat-vectordb
+    image: ghcr.io/danny-avila/librechat-rag-api-dev-lite:v0.6.0
+    env_file: ./.librechat.env
+    environment:
+      - DB_HOST=librechat-vectordb
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DB=postgres
+    restart: unless-stopped
+
+  librechat-mongodb:
+    image: mongo:8.2.2
+    volumes:
+      - ./.volumes/librechat-mongodb:/data/db
+    restart: unless-stopped
+
+  librechat-meilisearch:
+    image: getmeili/meilisearch:v1.12.3
+    volumes:
+      - ./.volumes/librechat-meilisearch:/meili_data
+    restart: unless-stopped
+
+  librechat-vectordb:
+    image: pgvector/pgvector:0.8.0-pg15-trixie
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - ./.volumes/librechat-vectordb:/var/lib/postgresql/data
+    restart: unless-stopped
