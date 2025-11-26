@@ -4,7 +4,7 @@ include:
 
 services:
   n8n:
-    image: docker.n8n.io/n8nio/n8n:1.122.2
+    image: docker.n8n.io/n8nio/n8n:1.122.3
     environment:
       - WEBHOOK_URL=https://n8n.$DOMAIN
     volumes:
