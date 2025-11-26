@@ -48,7 +48,7 @@ services:
     restart: unless-stopped
 
   librechat-vectordb:
-    image: pgvector/pgvector:0.8.0-pg15-trixie
+    image: pgvector/pgvector:0.8.1-pg15-trixie
     environment:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
