@@ -33,6 +33,7 @@ services:
     environment:
       - DISCORD_BOT_TOKEN=$DISCORD_BOT_TOKEN
       - OPENROUTER_API_KEY=$OPENROUTER_API_KEY
+      - OPENROUTER_MODEL=$OPENROUTER_MODEL
       - TAVILY_API_KEY=$TAVILY_API_KEY
     volumes:
       - ~/.kube/config:/root/.kube/config:ro
