@@ -27,5 +27,16 @@ services:
       - traefik.http.routers.kara.middlewares=cache-control-private@docker
       - traefik.http.services.kara-docker.loadbalancer.server.port=8080
 
+  urara:
+    image: ghcr.io/astral-sh/uv:python3.14-trixie
+    entrypoint: uvx --from git+https://github.com/NextFire/urara.git@2e62471eca8191eec3e667ed76b7f5c88c825f05 urara
+    environment:
+      - DISCORD_BOT_TOKEN=$DISCORD_BOT_TOKEN
+      - OPENROUTER_API_KEY=$OPENROUTER_API_KEY
+      - TAVILY_API_KEY=$TAVILY_API_KEY
+    volumes:
+      - ~/.kube/config:/root/.kube/config:ro
+    restart: unless-stopped
+
 volumes:
   registry-data:
