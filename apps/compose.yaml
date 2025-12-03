@@ -15,7 +15,7 @@ services:
       - traefik.http.services.n8n-docker.loadbalancer.server.port=5678
 
   open-webui:
-    image: ghcr.io/open-webui/open-webui:0.6.40
+    image: ghcr.io/open-webui/open-webui:0.6.41
     volumes:
       - ./.volumes/open-webui:/app/backend/data
     restart: unless-stopped
