@@ -1,6 +1,6 @@
 services:
   rclone:
-    image: rclone/rclone:1.71.0
+    image: rclone/rclone:1.72.0
     command: mount $RCLONE_REMOTE /remote --vfs-cache-mode full --cache-dir /cache --transfers 50 --checkers 100 --allow-other --allow-non-empty --verbose
     volumes:
       - ../shared/rclone:/config/rclone
