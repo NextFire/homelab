@@ -17,7 +17,9 @@ services:
   playwright-mcp:
     image: mcr.microsoft.com/playwright/mcp:v0.0.49
     entrypoint: node
-    command: cli.js --headless --browser chromium --no-sandbox --port 8931 --allowed-hosts *
+    command: cli.js --headless --browser chromium --no-sandbox --port 8931 --allowed-hosts * --user-data-dir /data
+    volumes:
+      - ./.volumes/playwright-mcp:/data
     restart: unless-stopped
 
   open-webui:
