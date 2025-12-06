@@ -14,14 +14,6 @@ services:
       - traefik.http.routers.n8n.entrypoints=websecure
       - traefik.http.services.n8n-docker.loadbalancer.server.port=5678
 
-  playwright-mcp:
-    image: mcr.microsoft.com/playwright/mcp:v0.0.50
-    entrypoint: node
-    command: cli.js --headless --browser chromium --no-sandbox --port 8931 --allowed-hosts * --isolated --user-data-dir /data
-    volumes:
-      - ./.volumes/playwright-mcp:/data
-    restart: unless-stopped
-
   open-webui:
     image: ghcr.io/open-webui/open-webui:0.6.41
     volumes:
