@@ -1,7 +1,7 @@
 ---
 - name: Add compose files
   ansible.builtin.copy:
-    src: compose
+    src: compose/
     dest: ~/compose
     mode: preserve
   notify: Compose up

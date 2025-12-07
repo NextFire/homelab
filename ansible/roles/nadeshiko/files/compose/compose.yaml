@@ -23,7 +23,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   watchtower:
-    image: containrrr/watchtower:latest
+    image: nickfedor/watchtower:latest
     command:
       - --cleanup
     volumes:
