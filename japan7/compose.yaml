@@ -70,14 +70,14 @@ services:
       - traefik.http.routers.registry.service=registry-docker
       - traefik.http.services.registry-docker.loadbalancer.server.port=5000
 
-  aoc:
-    image: denoland/deno:alpine
-    command:
-      - run
-      - -A
-      - /app/main.ts
-    volumes:
-      - ./.volumes/aoc:/app
-    restart: unless-stopped
-    labels:
-      - com.centurylinklabs.watchtower.enable=false
+  # aoc:
+  #   image: denoland/deno:alpine
+  #   command:
+  #     - run
+  #     - -A
+  #     - /app/main.ts
+  #   volumes:
+  #     - ./.volumes/aoc:/app
+  #   restart: unless-stopped
+  #   labels:
+  #     - com.centurylinklabs.watchtower.enable=false
