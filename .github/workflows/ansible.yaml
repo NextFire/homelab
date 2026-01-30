@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Run Compose play
-        uses: dawidd6/action-ansible-playbook@v6
+        uses: dawidd6/action-ansible-playbook@v7
         with:
           playbook: playbook.yaml
           directory: ansible/
