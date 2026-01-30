@@ -1,3 +1,0 @@
-[submodule "apps/openclaw"]
-	path = apps/openclaw
-	url = git@github.com:openclaw/openclaw.git
