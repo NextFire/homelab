@@ -31,10 +31,13 @@ services:
       context: openclaw
       dockerfile: Dockerfile
     entrypoint: ["node", "dist/index.js"]
-    command: gateway
+    command: gateway --bind lan
     volumes:
       - ./.volumes/openclaw:/home/node/.openclaw
     restart: unless-stopped
-
-volumes:
-  registry-data:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.openclaw.entrypoints=websecure
+      - traefik.http.routers.openclaw.rule=Host(`claw.$DOMAIN`)
+      - traefik.http.routers.openclaw.middlewares=authelia@docker
+      - traefik.http.services.openclaw-docker.loadbalancer.server.port=18789
