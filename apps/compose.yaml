@@ -26,5 +26,15 @@ services:
       - traefik.http.routers.kara.middlewares=cache-control-private@docker
       - traefik.http.services.kara-docker.loadbalancer.server.port=8080
 
+  openclaw:
+    build:
+      context: openclaw
+      dockerfile: Dockerfile
+    entrypoint: ["node", "dist/index.js"]
+    command: gateway
+    volumes:
+      - ./.volumes/openclaw:/home/node/.openclaw
+    restart: unless-stopped
+
 volumes:
   registry-data:
