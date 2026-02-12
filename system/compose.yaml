@@ -49,7 +49,7 @@ services:
       - traefik.http.middlewares.japan7-basic.basicauth.users=$JAPAN7_BASIC_AUTH
 
   authelia:
-    image: authelia/authelia:4.37.5
+    image: authelia/authelia:4.39.15
     environment:
       - AUTHELIA_NOTIFIER_FILESYSTEM_FILENAME=/config/notification.txt
     volumes:
