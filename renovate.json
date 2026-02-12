@@ -17,11 +17,6 @@
     {
       "matchPackageNames": ["lscr.io/linuxserver/{/,}**"],
       "allowedVersions": "<10"
-    },
-    {
-      "matchPackageNames": ["authelia/authelia"],
-      "matchUpdateTypes": ["minor"],
-      "automerge": false
     }
   ]
 }
