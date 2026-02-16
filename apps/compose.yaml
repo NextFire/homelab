@@ -15,7 +15,7 @@ services:
       - traefik.http.services.n8n-docker.loadbalancer.server.port=5678
 
   kara:
-    image: svenstaro/miniserve:0.32.0-alpine
+    image: svenstaro/miniserve:0.33.0-alpine
     command: /html
     volumes:
       - ./.volumes/kara:/html:ro
