@@ -16,4 +16,4 @@ jobs:
           playbook: playbook.yaml
           directory: ansible/
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          options: --diff -i hosts.cfg -u root --tags compose
+          options: --diff -i hosts.cfg -u fedora --tags compose
