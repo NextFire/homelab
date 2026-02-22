@@ -48,7 +48,7 @@ services:
       - traefik.http.services.tautulli-docker.loadbalancer.server.port=8181
 
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:4.6.7
+    image: lscr.io/linuxserver/qbittorrent:5.1.4
     depends_on:
       rclone:
         condition: service_healthy
