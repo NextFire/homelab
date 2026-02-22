@@ -11,6 +11,10 @@
   },
   "packageRules": [
     {
+      "matchPackageNames": ["rclone/rclone"],
+      "automerge": false
+    },
+    {
       "matchPackageNames": ["lscr.io/linuxserver/{/,}**"],
       "allowedVersions": "<10"
     },
