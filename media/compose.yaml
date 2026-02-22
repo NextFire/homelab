@@ -13,9 +13,16 @@ services:
     security_opt:
       - apparmor:unconfined
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mountpoint", "-q", "/remote"]
+      start_period: 10s
 
   plex:
     image: lscr.io/linuxserver/plex:1.43.0
+    depends_on:
+      rclone:
+        condition: service_healthy
+        restart: true
     environment:
       - VERSION=docker
       - DOCKER_MODS=linuxserver/mods:plex-absolute-hama
@@ -42,6 +49,10 @@ services:
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:4.6.7
+    depends_on:
+      rclone:
+        condition: service_healthy
+        restart: true
     volumes:
       - ./.volumes/qbittorrent:/config
       - ./qbittorrent/scripts:/config/scripts:ro
@@ -66,6 +77,10 @@ services:
 
   mkvtoolnix:
     image: jlesage/mkvtoolnix:v26.02.1
+    depends_on:
+      rclone:
+        condition: service_healthy
+        restart: true
     volumes:
       - ./.volumes/mkvtoolnix:/config
       - $RCLONE_HOST_MOUNT:/storage:slave
