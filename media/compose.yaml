@@ -76,7 +76,7 @@ services:
       - traefik.http.services.flexget-docker.loadbalancer.server.port=5050
 
   mkvtoolnix:
-    image: jlesage/mkvtoolnix:v26.02.1
+    image: jlesage/mkvtoolnix:v26.02.2
     depends_on:
       rclone:
         condition: service_healthy
