@@ -1,5 +1,6 @@
 ---
 - name: Compose up
+  become: true
   community.general.make:
     target: up
     chdir: ~/homelab
