@@ -22,10 +22,6 @@
       "matchPackageNames": ["authelia/authelia"],
       "matchUpdateTypes": ["minor"],
       "automerge": false
-    },
-    {
-      "matchPackageNames": ["bitnamilegacy/minio"],
-      "allowedVersions": "<2025.5.24"
     }
   ]
 }
