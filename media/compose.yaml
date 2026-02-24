@@ -75,21 +75,5 @@ services:
       - traefik.http.routers.flexget.entrypoints=websecure
       - traefik.http.services.flexget-docker.loadbalancer.server.port=5050
 
-  mkvtoolnix:
-    image: jlesage/mkvtoolnix:v26.02.2
-    depends_on:
-      rclone:
-        condition: service_healthy
-        restart: true
-    volumes:
-      - ./.volumes/mkvtoolnix:/config
-      - $RCLONE_HOST_MOUNT:/storage:slave
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.mkvtoolnix.entrypoints=websecure
-      - traefik.http.routers.mkvtoolnix.middlewares=authelia@docker
-      - traefik.http.services.mkvtoolnix-docker.loadbalancer.server.port=5800
-
 volumes:
   rclone-cache:
