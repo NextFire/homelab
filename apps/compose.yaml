@@ -23,5 +23,4 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.kara.entrypoints=websecure
-      - traefik.http.routers.kara.middlewares=cache-control-private@docker
       - traefik.http.services.kara-docker.loadbalancer.server.port=8080

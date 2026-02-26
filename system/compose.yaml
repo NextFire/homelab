@@ -36,16 +36,7 @@ services:
       - traefik.http.routers.traefik.entrypoints=websecure
       - traefik.http.routers.traefik.middlewares=authelia@docker
       - traefik.http.routers.traefik.service=api@internal
-      # Root router
-      - traefik.http.routers.root.entrypoints=websecure
-      - traefik.http.routers.root.rule=Host(`$DOMAIN`)
-      - traefik.http.routers.root.middlewares=homepage-redirect@docker
-      - traefik.http.routers.root.service=noop@internal
-      - traefik.http.middlewares.homepage-redirect.redirectregex.regex=.*
-      - traefik.http.middlewares.homepage-redirect.redirectregex.replacement=$HOMEPAGE_REDIRECT_URL
-      - traefik.http.middlewares.homepage-redirect.redirectregex.permanent=true
       # Middleware definitions
-      - traefik.http.middlewares.cache-control-private.headers.customresponseheaders.Cache-Control=private
       - traefik.http.middlewares.japan7-basic.basicauth.users=$JAPAN7_BASIC_AUTH
 
   authelia:
