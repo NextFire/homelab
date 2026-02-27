@@ -51,12 +51,12 @@ services:
       - traefik.http.routers.authelia.entrypoints=websecure
       - traefik.http.routers.authelia.rule=Host(`auth.$DOMAIN`)
       - traefik.http.services.authelia-docker.loadbalancer.server.port=9091
-      - traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https%3A%2F%2Fauth.${DOMAIN}%2F
+      - traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/authz/forward-auth?authelia_url=https%3A%2F%2Fauth.${DOMAIN}%2F
       - traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true
-      - traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email
+      - traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Email,Remote-Name
       - traefik.http.middlewares.authelia-basic.forwardAuth.address=http://authelia:9091/api/verify?auth=basic
       - traefik.http.middlewares.authelia-basic.forwardAuth.trustForwardHeader=true
-      - traefik.http.middlewares.authelia-basic.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email
+      - traefik.http.middlewares.authelia-basic.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Email,Remote-Name
 
   borg:
     image: b3vis/borgmatic:2.1.2
