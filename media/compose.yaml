@@ -72,7 +72,9 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.flexget.entrypoints=websecure
+      - traefik.http.routers.flexget.middlewares=authelia@docker,flexget-auth@docker
       - traefik.http.services.flexget-docker.loadbalancer.server.port=5050
+      - traefik.http.middlewares.flexget-auth.headers.customRequestHeaders.Authorization=Token $FLEXGET_TOKEN
 
 volumes:
   rclone-cache:
