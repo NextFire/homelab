@@ -28,7 +28,7 @@ services:
       - DOCKER_MODS=linuxserver/mods:plex-absolute-hama
     volumes:
       - ./.volumes/plex:/config
-      - $RCLONE_HOST_MOUNT:$MEDIA_MOUNT:ro,slave
+      - $RCLONE_HOST_MOUNT:$PLEX_MEDIA_MOUNT:ro,slave
     restart: unless-stopped
     labels:
       - traefik.enable=true

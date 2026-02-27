@@ -2,7 +2,7 @@ services:
   traefik:
     image: traefik:v3.6.9
     environment:
-      - CLOUDFLARE_DNS_API_TOKEN=$CLOUDFLARE_DNS_API_TOKEN
+      - CLOUDFLARE_DNS_API_TOKEN=$TRAEFIK_CLOUDFLARE_DNS_API_TOKEN
     command:
       - --log.level=INFO
       - --accesslog=true
@@ -18,7 +18,7 @@ services:
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
       - --entrypoints.websecure.http3=true
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
-      - --certificatesresolvers.letsencrypt.acme.email=$ACME_EMAIL
+      - --certificatesresolvers.letsencrypt.acme.email=$TRAEFIK_ACME_EMAIL
       - --certificatesresolvers.letsencrypt.acme.storage=/config/acme.json
     ports:
       - "80:80/tcp"
@@ -37,7 +37,7 @@ services:
       - traefik.http.routers.traefik.middlewares=authelia@docker
       - traefik.http.routers.traefik.service=api@internal
       # Middleware definitions
-      - traefik.http.middlewares.japan7-basic.basicauth.users=$JAPAN7_BASIC_AUTH
+      - traefik.http.middlewares.japan7-basic.basicauth.users=$TRAEFIK_JAPAN7_BASIC_AUTH
 
   authelia:
     image: authelia/authelia:4.39.15
@@ -65,7 +65,7 @@ services:
       - BORG_REPO_REMOTE=$BORG_REPO_REMOTE
     volumes:
       - ..:/mnt/source:ro # backup source
-      - $BORG_REPO:/mnt/borg-repository # backup target
+      - $BORG_REPO_HOST:/mnt/borg-repository # backup target
       - ./borg/etc:/etc/borgmatic.d/:ro # borgmatic config file(s) + crontab.txt
       - ./.volumes/borg/config:/root/.config/borg # config and keyfiles
       - ./.volumes/borg/cache:/root/.cache/borg # checksums used for deduplication
