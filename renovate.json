@@ -17,6 +17,24 @@
     {
       "matchPackageNames": ["lscr.io/linuxserver/{/,}**"],
       "allowedVersions": "<10"
+    },
+    {
+      "matchPackageNames": ["docker.n8n.io/n8nio/n8n"],
+      "matchManagers": ["docker-compose"],
+      "enabled": false
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^apps\\/compose.yaml$/"],
+      "matchStrings": [
+        "image:\\s*docker.n8n.io\\/n8nio\\/n8n:(?<currentValue>[^\\s]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "n8n-io/n8n",
+      "extractVersionTemplate": "n8n@(?<version>.*)",
+      "versioningTemplate": "semver-coerced"
     }
   ]
 }
