@@ -12,8 +12,8 @@ services:
       - traefik.http.services.files-docker.loadbalancer.server.port=8080
 
   projo:
-    image: svenstaro/miniserve:0.33.0-alpine
-    command: /html
+    image: caddy:2.11.2-alpine
+    command: caddy file-server --root /html --browse --access-log
     volumes:
       - $PROJO_HOST_MOUNT:/html:ro
     restart: unless-stopped
@@ -21,7 +21,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.projo.entrypoints=websecure
       - traefik.http.routers.projo.middlewares=japan7-basic@docker
-      - traefik.http.services.projo-docker.loadbalancer.server.port=8080
+      - traefik.http.services.projo-docker.loadbalancer.server.port=80
 
   projo-cron:
     image: python:3.14.3-alpine

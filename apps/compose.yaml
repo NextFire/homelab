@@ -15,12 +15,12 @@ services:
       - traefik.http.services.n8n-docker.loadbalancer.server.port=5678
 
   kara:
-    image: svenstaro/miniserve:0.33.0-alpine
-    command: /html
+    image: caddy:2.11.2-alpine
+    command: caddy file-server --root /html --browse --access-log
     volumes:
       - ./.volumes/kara:/html:ro
     restart: unless-stopped
     labels:
       - traefik.enable=true
       - traefik.http.routers.kara.entrypoints=websecure
-      - traefik.http.services.kara-docker.loadbalancer.server.port=8080
+      - traefik.http.services.kara-docker.loadbalancer.server.port=80
