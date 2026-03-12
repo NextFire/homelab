@@ -2,6 +2,18 @@ include:
   - owntracks.compose.yaml
 
 services:
+  boinc:
+    image: boinc/client:arm64v8@sha256:2031746369792456c0cb03809a4f10d019c516504e23b1ccb649ba518261e0b4
+    entrypoint: sh -xc 'apt update && apt install -y libzip-dev && ln -sf libzip.so.5 /lib/aarch64-linux-gnu/libzip.so.4 && start-boinc.sh'
+    environment:
+      - BOINC_CMD_LINE_OPTIONS=--allow_remote_gui_rpc
+      - BOINC_GUI_RPC_PASSWORD=$BOINC_GUI_RPC_PASSWORD
+    ports:
+      - "31416:31416/tcp"
+    volumes:
+      - boinc-data:/var/lib/boinc
+    restart: unless-stopped
+
   n8n:
     image: docker.n8n.io/n8nio/n8n:2.11.3
     environment:
@@ -24,18 +36,6 @@ services:
       - traefik.enable=true
       - traefik.http.routers.kara.entrypoints=websecure
       - traefik.http.services.kara-docker.loadbalancer.server.port=80
-
-  boinc:
-    image: boinc/client:arm64v8@sha256:2031746369792456c0cb03809a4f10d019c516504e23b1ccb649ba518261e0b4
-    entrypoint: sh -xc 'apt update && apt install -y libzip-dev && ln -sf libzip.so.5 /lib/aarch64-linux-gnu/libzip.so.4 && start-boinc.sh'
-    environment:
-      - BOINC_CMD_LINE_OPTIONS=--allow_remote_gui_rpc
-      - BOINC_GUI_RPC_PASSWORD=$BOINC_GUI_RPC_PASSWORD
-    ports:
-      - "31416:31416/tcp"
-    volumes:
-      - boinc-data:/var/lib/boinc
-    restart: unless-stopped
 
 volumes:
   boinc-data:
