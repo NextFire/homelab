@@ -7,7 +7,7 @@
   ],
   "ignoreTests": true,
   "docker-compose": {
-    "managerFilePatterns": ["/.*\\.compose\\.yaml$/"]
+    "managerFilePatterns": ["**/*compose.yaml"]
   },
   "packageRules": [
     {
@@ -22,19 +22,30 @@
       "matchPackageNames": ["docker.n8n.io/n8nio/n8n"],
       "matchManagers": ["docker-compose"],
       "enabled": false
+    },
+    {
+      "matchFileNames": ["**/*Containerfile"],
+      "automerge": false
     }
   ],
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^apps\\/compose.yaml$/"],
+      "managerFilePatterns": ["apps/compose.yaml"],
       "matchStrings": [
-        "image:\\s*docker.n8n.io\\/n8nio\\/n8n:(?<currentValue>[^\\s]+)"
+        "image:\\s*docker.n8n.io\\/n8nio\\/n8n:(?<currentValue>\\S+)"
       ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "n8n-io/n8n",
-      "extractVersionTemplate": "n8n@(?<version>.*)",
+      "extractVersionTemplate": "n8n@(?<version>\\S+)",
       "versioningTemplate": "semver-coerced"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["apps/boinc/manager.Containerfile"],
+      "matchStrings": ["jlesage\\/baseimage-gui:\\S+-(?<currentValue>\\S+)"],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "jlesage/docker-baseimage-gui"
     }
   ]
 }
