@@ -1,0 +1,28 @@
+services:
+  boinc-client:
+    build:
+      context: boinc
+      dockerfile: client.Containerfile
+    environment:
+      - BOINC_CMD_LINE_OPTIONS=--allow_remote_gui_rpc
+      - BOINC_GUI_RPC_PASSWORD=$BOINC_GUI_RPC_PASSWORD
+    volumes:
+      - boinc-data:/var/lib/boinc
+    restart: unless-stopped
+
+  boinc-manager:
+    build:
+      context: boinc
+      dockerfile: manager.Containerfile
+    volumes:
+      - ./.volumes/boinc-manager:/config
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.boinc-manager.entrypoints=websecure
+      - traefik.http.routers.boinc-manager.rule=Host(`boinc.$DOMAIN`)
+      - traefik.http.routers.boinc-manager.middlewares=authelia@docker
+      - traefik.http.services.boinc-manager-docker.loadbalancer.server.port=5800
+
+volumes:
+  boinc-data:

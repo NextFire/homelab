@@ -5,7 +5,7 @@ compose:
 	cd ansible/ && ansible-playbook --diff -i hosts.cfg playbook.yaml --tags compose
 
 up:
-	docker compose up -d --build --remove-orphans
+	docker compose up -d --remove-orphans
 	docker image prune -a -f
 	docker system prune -f
 
