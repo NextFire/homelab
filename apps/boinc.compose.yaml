@@ -1,8 +1,6 @@
 services:
   boinc-client:
-    build:
-      context: boinc
-      dockerfile: client.Containerfile
+    image: boinc/client:arm64v8@sha256:2031746369792456c0cb03809a4f10d019c516504e23b1ccb649ba518261e0b4
     environment:
       - BOINC_CMD_LINE_OPTIONS=--allow_remote_gui_rpc
       - BOINC_GUI_RPC_PASSWORD=$BOINC_GUI_RPC_PASSWORD
