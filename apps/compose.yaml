@@ -1,5 +1,5 @@
 include:
-  - boinc.compose.yaml
+  # - boinc.compose.yaml
   - owntracks.compose.yaml
 
 services:
