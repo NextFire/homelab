@@ -1,4 +1,4 @@
-FROM jlesage/baseimage-gui:ubuntu-24.04-v4.12.0
+FROM jlesage/baseimage-gui:ubuntu-24.04-v4.11.3
 
 RUN <<EOF
 add-pkg boinc-manager
