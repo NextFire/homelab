@@ -1,4 +1,5 @@
 ---
+# ansible-playbook --diff -i hosts.cfg playbook.yaml --tags config
 - name: Configure
   hosts: config
   tags: config
@@ -13,9 +14,3 @@
       ansible.builtin.include_role:
         name: nadeshiko
       when: inventory_hostname == 'nadeshiko.yuru.moe'
-
-- name: Compose
-  hosts: compose
-  tags: compose
-  roles:
-    - compose
