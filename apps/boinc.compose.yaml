@@ -5,7 +5,7 @@ services:
       - BOINC_CMD_LINE_OPTIONS=--allow_remote_gui_rpc
       - BOINC_GUI_RPC_PASSWORD=$BOINC_GUI_RPC_PASSWORD
     volumes:
-      - boinc-data:/var/lib/boinc
+      - boinc-client-data:/var/lib/boinc
     restart: unless-stopped
 
   boinc-manager:
@@ -13,7 +13,7 @@ services:
       context: boinc
       dockerfile: manager.Containerfile
     volumes:
-      - ./.volumes/boinc-manager:/config
+      - boinc-manager-data:/config
     restart: unless-stopped
     labels:
       - traefik.enable=true
@@ -23,4 +23,5 @@ services:
       - traefik.http.services.boinc-manager-docker.loadbalancer.server.port=5800
 
 volumes:
-  boinc-data:
+  boinc-client-data:
+  boinc-manager-data:
