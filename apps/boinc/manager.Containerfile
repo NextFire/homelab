@@ -1,4 +1,4 @@
-FROM jlesage/baseimage-gui:debian-13-v4.12.3
+FROM jlesage/baseimage-gui:debian-13-v4.12.4
 
 RUN <<EOF
 add-pkg boinc-manager
