@@ -55,7 +55,7 @@ services:
     volumes:
       - ./.volumes/jellyfin:/config
       - jellyfin-cache:/cache
-      - $RCLONE_HOST_MOUNT:$PLEX_MEDIA_MOUNT:ro,slave
+      - $RCLONE_HOST_MOUNT:/media:ro,slave
     restart: unless-stopped
     labels:
       - traefik.enable=true
