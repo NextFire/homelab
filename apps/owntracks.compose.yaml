@@ -4,6 +4,7 @@ services:
     hostname: owntracks-recorder
     environment:
       - OTR_PORT=0
+      - OTR_LUASCRIPT=/store/hook.lua
     volumes:
       - ./.volumes/owntracks-recorder:/store
     restart: unless-stopped
