@@ -1,6 +1,6 @@
 services:
   owntracks-recorder:
-    image: owntracks/recorder:1.0.3
+    image: owntracks/recorder:1.0.4
     hostname: owntracks-recorder
     environment:
       - OTR_PORT=0
