@@ -27,6 +27,7 @@ services:
     volumes:
       - ./.volumes/plex:/config
       - $RCLONE_HOST_MOUNT:$PLEX_MEDIA_MOUNT:ro,slave
+      - $MUSIC_HOST_MOUNT:$PLEX_MUSIC_MOUNT:ro
     restart: unless-stopped
     labels:
       - traefik.enable=true
