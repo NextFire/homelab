@@ -98,6 +98,9 @@ services:
     user: "$UID:$GID"
     environment:
       - SLSKD_REMOTE_CONFIGURATION=true
+      - SLSKD_NO_AUTH=true
+    ports:
+      - "50300:50300/tcp"
     volumes:
       - ./.volumes/slskd:/app
       - $MUSIC_HOST_MOUNT:/music
