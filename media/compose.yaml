@@ -100,7 +100,7 @@ services:
       - SLSKD_REMOTE_CONFIGURATION=true
     volumes:
       - ./.volumes/slskd:/app
-      - $MUSIC_HOST_MOUNT/Soulseek:/music
+      - $MUSIC_HOST_MOUNT:/music
     restart: unless-stopped
     labels:
       - traefik.enable=true
