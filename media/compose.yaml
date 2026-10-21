@@ -64,7 +64,7 @@ services:
       - traefik.http.services.jellyfin-docker.loadbalancer.server.port=8096
 
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:5.2.4
+    image: lscr.io/linuxserver/qbittorrent:5.3.0
     depends_on:
       rclone:
         condition: service_healthy
